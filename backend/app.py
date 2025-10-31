@@ -30,8 +30,14 @@ def create_app(config_name=None):
     config = get_config(config_name)
     app.config.from_object(config)
     
-    # Initialize extensions
-    CORS(app, origins=config.CORS_ORIGINS, supports_credentials=True)
+    # Initialize extensions with explicit CORS configuration
+    CORS(app, 
+         origins=config.CORS_ORIGINS,
+         supports_credentials=True,
+         allow_headers=['Content-Type', 'Authorization'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+         expose_headers=['Content-Type', 'Authorization'],
+         max_age=3600)
     jwt = JWTManager(app)
     
     # Setup logging
