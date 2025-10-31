@@ -16,5 +16,8 @@ COPY . /app/
 # Expose port (Railway sets this via $PORT)
 EXPOSE 5000
 
-# Change to backend directory and start with Gunicorn
-CMD cd backend && gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+# Set working directory to backend
+WORKDIR /app/backend
+
+# Start with Gunicorn (shell form to allow $PORT expansion)
+CMD gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
