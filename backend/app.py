@@ -34,6 +34,10 @@ def create_app(config_name=None):
     config = get_config(config_name)
     app.config.from_object(config)
     
+    # Debug: Log CORS origins
+    print(f"DEBUG: CORS_ORIGINS = {config.CORS_ORIGINS}")
+    print(f"DEBUG: CORS_ORIGINS type = {type(config.CORS_ORIGINS)}")
+    
     # Initialize extensions with explicit CORS configuration
     CORS(app, 
          origins=config.CORS_ORIGINS,
