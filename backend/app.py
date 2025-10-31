@@ -26,6 +26,10 @@ def create_app(config_name=None):
     """
     app = Flask(__name__)
     
+    # Determine config name from environment if not provided
+    if config_name is None:
+        config_name = os.environ.get('FLASK_ENV', 'development')
+    
     # Load configuration
     config = get_config(config_name)
     app.config.from_object(config)
