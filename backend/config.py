@@ -27,10 +27,13 @@ class Config:
     # CORS
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5000').split(',')
     
-    # Email Configuration
-    EMAIL_SERVICE = os.environ.get('EMAIL_SERVICE', 'sendgrid')  # sendgrid, ses, smtp
-    SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '')
-    EMAIL_FROM = os.environ.get('EMAIL_FROM', 'noreply@fetcha.com')
+    # Email Configuration - SMTP (Gmail or GoDaddy/SecureServer)
+    SMTP_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')
+    SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+    SMTP_USE_SSL = os.environ.get('SMTP_USE_SSL', 'false')  # 'true' for port 465 SSL, 'false' for port 587 STARTTLS
+    SMTP_USERNAME = os.environ.get('SMTP_USERNAME', '')  # Email address or Gmail address
+    SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')  # Email password or Gmail App Password
+    EMAIL_FROM = os.environ.get('EMAIL_FROM', os.environ.get('SMTP_USERNAME', 'noreply@fetcha.net'))
     EMAIL_FROM_NAME = os.environ.get('EMAIL_FROM_NAME', 'Fetcha Weather')
     
     # Frontend URLs

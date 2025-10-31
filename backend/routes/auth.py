@@ -7,6 +7,7 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from email_validator import validate_email, EmailNotValidError
 from models.user import User
+from services.email_service import EmailService
 from config import get_config
 import re
 
@@ -112,13 +113,29 @@ def signup():
         # Log the event
         current_app.logger.info(f'New user registered: {email}')
         
-        # In production, send verification email here
-        # For now, return the token (in production, only send via email)
+        # Send verification email
+        email_service = EmailService(current_app.config)
+        email_result = email_service.send_verification_email(
+            to_email=email,
+            verification_token=result['verification_token'],
+            user_name=full_name
+        )
+        
+        if not email_result['success']:
+            current_app.logger.error(f'Failed to send verification email to {email}: {email_result.get("error")}')
+            # Still return success for user creation, but note email issue
+            return jsonify({
+                'success': True,
+                'message': 'Account created but verification email failed to send. Please request a new verification email.',
+                'user': result['user'],
+                'email_sent': False
+            }), 201
+        
         return jsonify({
             'success': True,
             'message': 'User created successfully. Please check your email to verify your account.',
             'user': result['user'],
-            'verification_token': result['verification_token']  # Remove in production
+            'email_sent': True
         }), 201
         
     except Exception as e:
@@ -259,11 +276,26 @@ def resend_verification():
         
         if result['success']:
             current_app.logger.info(f'Verification email resent to: {email}')
-            # In production, send email here
+            
+            # Send verification email
+            email_service = EmailService(current_app.config)
+            email_result = email_service.send_verification_email(
+                to_email=email,
+                verification_token=result['verification_token'],
+                user_name=result.get('user', {}).get('full_name')
+            )
+            
+            if not email_result['success']:
+                current_app.logger.error(f'Failed to send verification email to {email}: {email_result.get("error")}')
+                return jsonify({
+                    'success': False,
+                    'error': 'Failed to send verification email. Please try again later.'
+                }), 500
+            
             return jsonify({
                 'success': True,
                 'message': 'Verification email sent. Please check your inbox.',
-                'verification_token': result['verification_token']  # Remove in production
+                'email_sent': True
             }), 200
         else:
             return jsonify(result), 400
@@ -307,17 +339,23 @@ def forgot_password():
         # Always return success to prevent email enumeration
         if 'reset_token' in result:
             current_app.logger.info(f'Password reset requested for: {email}')
-            # In production, send email here
-            return jsonify({
-                'success': True,
-                'message': 'If the email exists, a password reset link has been sent.',
-                'reset_token': result['reset_token']  # Remove in production
-            }), 200
-        else:
-            return jsonify({
-                'success': True,
-                'message': 'If the email exists, a password reset link has been sent.'
-            }), 200
+            
+            # Send password reset email
+            email_service = EmailService(current_app.config)
+            email_result = email_service.send_password_reset_email(
+                to_email=email,
+                reset_token=result['reset_token'],
+                user_name=result.get('user', {}).get('full_name')
+            )
+            
+            if not email_result['success']:
+                current_app.logger.error(f'Failed to send password reset email to {email}: {email_result.get("error")}')
+        
+        # Always return the same message to prevent email enumeration
+        return jsonify({
+            'success': True,
+            'message': 'If the email exists, a password reset link has been sent.'
+        }), 200
         
     except Exception as e:
         current_app.logger.error(f'Forgot password error: {str(e)}')
