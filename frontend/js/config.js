@@ -10,14 +10,17 @@
   let apiBase;
   
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    // Development
-    apiBase = 'http://localhost:5000/api';
+    // Development (using port 5001 to avoid macOS AirPlay on 5000)
+    apiBase = 'http://localhost:5001/api';
+  } else if (hostname.includes('netlify.app')) {
+    // Production on Netlify - connects to Railway backend
+    apiBase = 'https://web-production-2d722.up.railway.app/api';
   } else if (hostname.includes('fetcha.weather') || hostname.includes('fetcha.net')) {
-    // Production
-    apiBase = 'https://api.fetcha.net/api';
+    // Production with custom domain
+    apiBase = 'https://web-production-2d722.up.railway.app/api';
   } else {
-    // Default to relative path for other deployments
-    apiBase = '/api';
+    // Default to Railway backend for any other deployment
+    apiBase = 'https://web-production-2d722.up.railway.app/api';
   }
   
   // Set global API base

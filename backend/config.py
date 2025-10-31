@@ -101,7 +101,7 @@ class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
     SESSION_COOKIE_SECURE = False  # Allow HTTP in development
-    CORS_ORIGINS = ['http://localhost:3000', 'http://localhost:5000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000', 'null']  # 'null' allows file:// protocol
+    CORS_ORIGINS = ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000', 'http://127.0.0.1:5001', 'http://127.0.0.1:8000', 'null']  # 'null' allows file:// protocol
 
 
 class ProductionConfig(Config):
@@ -117,8 +117,9 @@ class ProductionConfig(Config):
     VERIFY_EMAIL_URL = f"{FRONTEND_URL}/verify-email"
     RESET_PASSWORD_URL = f"{FRONTEND_URL}/reset-password"
     
-    # Production CORS
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://weather.fetcha.com').split(',')
+    # Production CORS - Allow Netlify and custom domains
+    default_origins = 'https://weather.fetcha.com,https://*.netlify.app'
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', default_origins).split(',')
     
     # Production security
     SESSION_COOKIE_SECURE = True
