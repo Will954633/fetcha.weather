@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Fetcha Weather API</title>
+    <meta name="description" content="Complete API documentation for Fetcha Weather - Australian Weather Data API">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #10b981;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --background: #ffffff;
+            --background-alt: #f9fafb;
+            --border: #e5e7eb;
+            --code-bg: #1e293b;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--background);
+        }
+        
+        /* Header */
+        header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        /* Layout */
+        .docs-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 2rem;
+            padding: 2rem;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+        }
+        
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-nav a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--background-alt);
+            color: var(--primary-color);
+        }
+        
+        /* Content */
+        .content {
+            max-width: 800px;
+        }
+        
+        .content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .content h2 {
+            font-size: 2rem;
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-dark);
+        }
+        
+        .content h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--text-dark);
+        }
+        
+        .content p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+        }
+        
+        .content ul, .content ol {
+            margin: 1rem 0 1rem 2rem;
+            line-height: 1.8;
+        }
+        
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: var(--background-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--primary-color);
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        /* Alert boxes */
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            border-color: var(--primary-color);
+            color: #1e40af;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            border-color: var(--secondary-color);
+            color: #065f46;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--background-alt);
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        /* CTA */
+        .cta-button {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+        
+        .cta-button:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .docs-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 1rem;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="index.html" class="logo">⛅ Fetcha Weather</a>
+            <div class="nav-links">
+                <a href="index.html#features">Features</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="docs.html">Docs</a>
+                <a href="login.html">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Documentation Layout -->
+    <div class="docs-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="#getting-started" class="active">Getting Started</a></li>
+                <li><a href="#authentication">Authentication</a></li>
+                <li><a href="#rate-limits">Rate Limits</a></li>
+                <li><a href="#api-reference">API Reference</a></li>
+                <li><a href="#examples">Code Examples</a></li>
+                <li><a href="#error-codes">Error Codes</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <h1>API Documentation</h1>
+            <p>Welcome to the Fetcha Weather API documentation. This guide will help you get started with accessing Australian weather data from the Bureau of Meteorology.</p>
+
+            <!-- Getting Started -->
+            <h2 id="getting-started">Getting Started</h2>
+            
+            <h3>1. Create Your Account</h3>
+            <p>Sign up for a free account to get started. No credit card required.</p>
+            <a href="login.html?signup=true" class="cta-button">Sign Up Free</a>
+
+            <h3>2. Get Your API Key</h3>
+            <p>Once logged in, navigate to your dashboard to generate an API key. Keep this key secure - it's like a password for your account.</p>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Important:</strong> Never expose your API key in client-side code or public repositories. Always use environment variables or server-side code.
+            </div>
+
+            <h3>3. Make Your First Request</h3>
+            <p>Here's a simple example to get weather data for Melbourne:</p>
+
+            <pre><code>curl -H "X-API-Key: your_api_key_here" \
+  "https://api.fetchaweather.com/api/weather/location?location=Melbourne&state=Victoria"</code></pre>
+
+            <!-- Authentication -->
+            <h2 id="authentication">Authentication</h2>
+            <p>All API requests require authentication using an API key. Include your key in the request header:</p>
+
+            <pre><code>X-API-Key: your_api_key_here</code></pre>
+
+            <h3>Security Best Practices</h3>
+            <ul>
+                <li>Never commit API keys to version control</li>
+                <li>Use environment variables to store keys</li>
+                <li>Rotate keys if they're compromised</li>
+                <li>Use different keys for development and production</li>
+                <li>Monitor your usage regularly</li>
+            </ul>
+
+            <!-- Rate Limits -->
+            <h2 id="rate-limits">Rate Limits & Quotas</h2>
+            <p>Rate limits are based on your subscription tier:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Monthly Quota</th>
+                        <th>Rate Limit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Free</td>
+                        <td>100 requests/month</td>
+                        <td>10 requests/minute</td>
+                    </tr>
+                    <tr>
+                        <td>Pro</td>
+                        <td>5,000 requests/month</td>
+                        <td>100 requests/minute</td>
+                    </tr>
+                    <tr>
+                        <td>Enterprise</td>
+                        <td>Unlimited</td>
+                        <td>Custom</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-info">
+                <strong>💡 Tip:</strong> When you exceed your quota, you'll receive a 429 error. Your quota resets on the 1st of each month.
+            </div>
+
+            <!-- API Reference -->
+            <h2 id="api-reference">API Reference</h2>
+
+            <h3>Base URL</h3>
+            <pre><code>https://api.fetchaweather.com</code></pre>
+
+            <h3>GET /api/weather/location</h3>
+            <p>Retrieve weather data for a specific location.</p>
+
+            <h4>Parameters</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>location</td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>City or town name</td>
+                    </tr>
+                    <tr>
+                        <td>state</td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>State name or abbreviation (NSW, VIC, QLD, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td>date_from</td>
+                        <td>string</td>
+                        <td>No</td>
+                        <td>Start date (YYYY-MM-DD)</td>
+                    </tr>
+                    <tr>
+                        <td>date_to</td>
+                        <td>string</td>
+                        <td>No</td>
+                        <td>End date (YYYY-MM-DD)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Example Request</h4>
+            <pre><code>GET /api/weather/location?location=Sydney&state=NSW&date_from=2024-01-01&date_to=2024-01-31</code></pre>
+
+            <h4>Example Response</h4>
+            <pre><code>{
+  "success": true,
+  "data": {
+    "location": "Sydney",
+    "state": "New South Wales",
+    "station": "Sydney Observatory Hill",
+    "station_number": "066062",
+    "weather_data": [
+      {
+        "date": "2024-01-01",
+        "temperature_max": 28.5,
+        "temperature_min": 19.2,
+        "rainfall": 0.0,
+        "humidity_9am": 65,
+        "humidity_3pm": 52,
+        "wind_speed_9am": 15,
+        "wind_speed_3pm": 22
+      }
+    ]
+  },
+  "metadata": {
+    "total_records": 31,
+    "cached": true,
+    "timestamp": "2025-10-31T16:00:00+10:00"
+  }
+}</code></pre>
+
+            <h3>GET /api/weather/states</h3>
+            <p>List all available Australian states and territories.</p>
+
+            <h4>Example Response</h4>
+            <pre><code>{
+  "success": true,
+  "states": [
+    {"name": "New South Wales", "abbreviation": "NSW"},
+    {"name": "Victoria", "abbreviation": "VIC"},
+    {"name": "Queensland", "abbreviation": "QLD"},
+    {"name": "South Australia", "abbreviation": "SA"},
+    {"name": "Western Australia", "abbreviation": "WA"},
+    {"name": "Tasmania", "abbreviation": "TAS"},
+    {"name": "Northern Territory", "abbreviation": "NT"},
+    {"name": "Australian Capital Territory", "abbreviation": "ACT"}
+  ]
+}</code></pre>
+
+            <!-- Code Examples -->
+            <h2 id="examples">Code Examples</h2>
+
+            <h3>JavaScript / Node.js</h3>
+            <pre><code>const axios = require('axios');
+
+async function getWeather() {
+  try {
+    const response = await axios.get(
+      'https://api.fetchaweather.com/api/weather/location',
+      {
+        params: {
+          location: 'Brisbane',
+          state: 'Queensland',
+          date_from: '2024-01-01',
+          date_to: '2024-01-31'
+        },
+        headers: {
+          'X-API-Key': process.env.FETCHA_API_KEY
+        }
+      }
+    );
+    
+    console.log(response.data);
+  } catch (error) {
+    console.error('Error:', error.response.data);
+  }
+}
+
+getWeather();</code></pre>
+
+            <h3>Python</h3>
+            <pre><code>import requests
+import os
+
+def get_weather():
+    url = 'https://api.fetchaweather.com/api/weather/location'
+    
+    params = {
+        'location': 'Brisbane',
+        'state': 'Queensland',
+        'date_from': '2024-01-01',
+        'date_to': '2024-01-31'
+    }
+    
+    headers = {
+        'X-API-Key': os.getenv('FETCHA_API_KEY')
+    }
+    
+    try:
+        response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        print(data)
+    except requests.exceptions.RequestException as e:
+        print(f'Error: {e}')
+
+if __name__ == '__main__':
+    get_weather()</code></pre>
+
+            <h3>PHP</h3>
+            <pre><code>&lt;?php
+$apiKey = getenv('FETCHA_API_KEY');
+$url = 'https://api.fetchaweather.com/api/weather/location';
+
+$params = [
+    'location' => 'Perth',
+    'state' => 'Western Australia',
+    'date_from' => '2024-01-01',
+    'date_to' => '2024-01-31'
+];
+
+$ch = curl_init($url . '?' . http_build_query($params));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'X-API-Key: ' . $apiKey
+]);
+
+$response = curl_exec($ch);
+$data = json_decode($response, true);
+
+print_r($data);
+
+curl_close($ch);
+?&gt;</code></pre>
+
+            <!-- Error Codes -->
+            <h2 id="error-codes">Error Codes</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Error</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>400</td>
+                        <td>Bad Request</td>
+                        <td>Invalid parameters or missing required fields</td>
+                    </tr>
+                    <tr>
+                        <td>401</td>
+                        <td>Unauthorized</td>
+                        <td>Invalid or missing API key</td>
+                    </tr>
+                    <tr>
+                        <td>403</td>
+                        <td>Forbidden</td>
+                        <td>API key doesn't have permission for this resource</td>
+                    </tr>
+                    <tr>
+                        <td>404</td>
+                        <td>Not Found</td>
+                        <td>Location or resource not found</td>
+                    </tr>
+                    <tr>
+                        <td>429</td>
+                        <td>Too Many Requests</td>
+                        <td>Rate limit or quota exceeded</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>Internal Server Error</td>
+                        <td>Something went wrong on our end</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Error Response Format</h3>
+            <pre><code>{
+  "success": false,
+  "error": "Rate Limit Exceeded",
+  "message": "You have exceeded your monthly quota of 100 requests. Upgrade to Pro for 5,000 requests/month.",
+  "quota_remaining": 0,
+  "quota_reset": "2025-11-01T00:00:00+10:00"
+}</code></pre>
+
+            <!-- FAQ -->
+            <h2 id="faq">Frequently Asked Questions</h2>
+
+            <h3>What data do you provide?</h3>
+            <p>We provide official Bureau of Meteorology (BOM) weather data including temperature, rainfall, humidity, wind speed, and other meteorological observations from weather stations across Australia.</p>
+
+            <h3>How far back does historical data go?</h3>
+            <p>Historical data availability varies by location, with some stations having data from 1946 onwards. Most major cities have comprehensive historical records.</p>
+
+            <h3>How accurate is the data?</h3>
+            <p>All data comes directly from the Bureau of Meteorology and is as accurate as the official BOM records. We don't modify or predict data - we provide exactly what BOM publishes.</p>
+
+            <h3>Can I use this data commercially?</h3>
+            <p>Yes! All subscription tiers (including Free) allow commercial use. See our <a href="terms.html">Terms of Service</a> for details.</p>
+
+            <h3>How do I upgrade my plan?</h3>
+            <p>Upgrade functionality is coming soon with Phase 2 (Stripe integration). For now, all users are on the Free tier.</p>
+
+            <h3>Do you offer bulk data exports?</h3>
+            <p>Yes, bulk exports are available for Enterprise customers. <a href="mailto:hello@fetchaweather.com">Contact us</a> for custom solutions.</p>
+
+            <h3>What's your uptime guarantee?</h3>
+            <p>Free tier: Best effort. Pro tier: 99.9% SLA. Enterprise: Custom SLA available.</p>
+
+            <h3>How do I report an issue?</h3>
+            <p>Email us at <a href="mailto:hello@fetchaweather.com">hello@fetchaweather.com</a> with details about the issue.</p>
+
+            <div class="alert alert-success">
+                <strong>✅ Ready to start?</strong> <a href="login.html?signup=true">Create your free account</a> and get 100 API requests per month.
+            </div>
+        </main>
+    </div>
+</body>
+</html>

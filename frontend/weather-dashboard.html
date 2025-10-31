@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fetcha Weather — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20251028" />
+  <link rel="stylesheet" href="css/dashboard.css?v=20251028" />
+  <link rel="stylesheet" href="css/weather.css?v=20251028" />
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="logo">
+            <svg width="180" height="30" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+              <text x="10" y="40" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="600" fill="#2c3e50">Fetcha</text>
+              <text x="110" y="40" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="400" fill="#3498db">Weather</text>
+            </svg>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="user-menu">
+            <button id="userMenuBtn" class="user-menu-btn">
+              <span id="userName">Loading...</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+            </button>
+            <div id="userDropdown" class="user-dropdown hidden">
+              <div class="user-info">
+                <div class="user-name" id="userNameFull">Loading...</div>
+                <div class="user-email" id="userEmail">Loading...</div>
+                <div class="user-tier" id="userTier">Free Tier</div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <a href="pricing.html" class="dropdown-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                Upgrade Plan
+              </a>
+              <a href="documentation.html" class="dropdown-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14,2 14,8 20,8"></polyline>
+                </svg>
+                Documentation
+              </a>
+              <div class="dropdown-divider"></div>
+              <button id="logoutBtn" class="dropdown-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16,17 21,12 16,7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <div class="dashboard-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+          <div class="welcome-content">
+            <h2>Welcome to Fetcha Weather! 🌤️</h2>
+            <p>Access comprehensive Australian weather data through our simple API</p>
+          </div>
+        </section>
+
+        <!-- Quick Stats Grid -->
+        <section class="stats-section">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon weather-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="requestsThisMonth">0</div>
+                <div class="stat-label">Requests This Month</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon success-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20,6 9,17 4,12"></polyline>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="quotaRemaining">100</div>
+                <div class="stat-label">Quota Remaining</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon time-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12,6 12,12 16,14"></polyline>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value"><span id="avgResponseTime">0</span>ms</div>
+                <div class="stat-label">Avg Response Time</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- API Key Management -->
+        <section class="api-keys-section">
+          <div class="section-header">
+            <h3>API Keys</h3>
+            <button id="generateKeyBtn" class="btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Generate New Key
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div id="keysLoading" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading your API keys...</p>
+          </div>
+
+          <!-- API Keys List -->
+          <div id="apiKeysList" class="api-keys-list hidden">
+            <!-- Keys will be dynamically inserted here -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="keysEmptyState" class="empty-state hidden">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+              </svg>
+            </div>
+            <h4>No API keys yet</h4>
+            <p>Generate your first API key to start accessing weather data</p>
+            <button id="generateFirstKeyBtn" class="btn-primary">Generate Your First Key</button>
+          </div>
+        </section>
+
+        <!-- Quick Weather Query -->
+        <section class="weather-query-section">
+          <div class="section-header">
+            <h3>Quick Weather Query</h3>
+            <p class="section-subtitle">Test the API directly from your dashboard</p>
+          </div>
+
+          <div class="weather-query-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="queryLocation">Location</label>
+                <input type="text" id="queryLocation" placeholder="e.g., Melbourne, Launceston" />
+              </div>
+              <div class="form-group">
+                <label for="queryState">State</label>
+                <select id="queryState">
+                  <option value="">Select State</option>
+                  <option value="Queensland">Queensland (QLD)</option>
+                  <option value="New South Wales">New South Wales (NSW)</option>
+                  <option value="Victoria">Victoria (VIC)</option>
+                  <option value="Western Australia">Western Australia (WA)</option>
+                  <option value="South Australia">South Australia (SA)</option>
+                  <option value="Tasmania">Tasmania (TAS)</option>
+                  <option value="Northern Territory">Northern Territory (NT)</option>
+                  <option value="Australian Capital Territory">ACT</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="queryDateFrom">Date From</label>
+                <input type="date" id="queryDateFrom" />
+              </div>
+              <div class="form-group">
+                <label for="queryDateTo">Date To</label>
+                <input type="date" id="queryDateTo" />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button id="testQueryBtn" class="btn-primary btn-large">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="5,3 19,12 5,21 5,3"></polygon>
+                </svg>
+                Run Query
+              </button>
+              <button id="clearQueryBtn" class="btn-secondary">Clear</button>
+            </div>
+          </div>
+
+          <!-- Query Results -->
+          <div id="queryResults" class="query-results hidden">
+            <div class="results-header">
+              <h4>Query Results</h4>
+              <div class="results-actions">
+                <button id="copyResultsBtn" class="btn-icon" title="Copy to clipboard">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+                <button id="downloadResultsBtn" class="btn-icon" title="Download JSON">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7,10 12,15 17,10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="results-meta">
+              <span>Station: <strong id="resultStation">-</strong></span>
+              <span>Records: <strong id="resultCount">0</strong></span>
+              <span>Time: <strong id="resultTime">0ms</strong></span>
+              <span id="resultCached" class="hidden">✓ Cached</span>
+            </div>
+            <div id="queryResultsContent" class="results-content">
+              <!-- Results will be displayed here -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Recent Queries -->
+        <section class="recent-queries-section">
+          <div class="section-header">
+            <h3>Recent Queries</h3>
+            <button id="viewAllQueriesBtn" class="btn-text">View All</button>
+          </div>
+
+          <!-- Loading State -->
+          <div id="recentLoading" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading recent queries...</p>
+          </div>
+
+          <!-- Recent Queries Table -->
+          <div id="recentQueriesTable" class="queries-table hidden">
+            <table>
+              <thead>
+                <tr>
+                  <th>Location</th>
+                  <th>Date Range</th>
+                  <th>Records</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="recentQueriesBody">
+                <!-- Rows will be dynamically inserted here -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State -->
+          <div id="recentEmptyState" class="empty-state hidden">
+            <p>No queries yet. Try the quick query form above to get started!</p>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Status Messages -->
+  <div id="statusMessage" class="status-message hidden"></div>
+
+  <!-- Generate API Key Modal -->
+  <div id="generateKeyModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeGenerateKeyModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Generate API Key</h3>
+        <button onclick="closeGenerateKeyModal()" class="close-btn">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="keyName">Key Name (optional)</label>
+          <input type="text" id="keyName" placeholder="e.g., Production API, Development" />
+          <p class="input-hint">Give your key a name to help you identify it later</p>
+        </div>
+
+        <div class="form-actions">
+          <button id="confirmGenerateKeyBtn" class="btn-primary">Generate Key</button>
+          <button onclick="closeGenerateKeyModal()" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Show API Key Modal -->
+  <div id="showKeyModal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚠️ Save Your API Key</h3>
+      </div>
+      
+      <div class="modal-body">
+        <div class="warning-box">
+          <p><strong>Important:</strong> This is the only time you'll see this key. Make sure to copy it now!</p>
+        </div>
+
+        <div class="api-key-display">
+          <code id="newApiKeyValue">fw_...</code>
+          <button id="copyNewKeyBtn" class="btn-icon-large" title="Copy to clipboard">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="form-actions">
+          <button id="closeShowKeyBtn" class="btn-primary">I've Saved My Key</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/shared.js?v=20251028"></script>
+  <script src="js/weather-dashboard.js?v=20251028"></script>
+</body>
+</html>

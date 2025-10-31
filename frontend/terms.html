@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Fetcha Weather</title>
+    <meta name="description" content="Terms of Service for Fetcha Weather API">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #2563eb;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --background: #ffffff;
+            --background-alt: #f9fafb;
+            --border: #e5e7eb;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--background);
+        }
+        
+        header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .last-updated {
+            color: var(--text-light);
+            margin-bottom: 3rem;
+        }
+        
+        h2 {
+            font-size: 1.75rem;
+            margin: 2.5rem 0 1rem;
+            color: var(--text-dark);
+        }
+        
+        h3 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text-dark);
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+            line-height: 1.8;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        strong {
+            color: var(--text-dark);
+        }
+        
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">⛅ Fetcha Weather</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="docs.html">Docs</a>
+                <a href="login.html">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Terms of Service</h1>
+        <p class="last-updated">Last Updated: October 31, 2025</p>
+
+        <p>Welcome to Fetcha Weather ("Service", "we", "us", or "our"). By accessing or using our Australian weather data API service, you agree to be bound by these Terms of Service ("Terms"). Please read them carefully.</p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>By creating an account, accessing our API, or using any part of our Service, you agree to these Terms and our <a href="privacy.html">Privacy Policy</a>. If you disagree with any part of these terms, you may not access the Service.</p>
+
+        <h2>2. Description of Service</h2>
+        <p>Fetcha Weather provides access to historical and current Australian weather data sourced from the Bureau of Meteorology (BOM) through a RESTful API. We offer:</p>
+        <ul>
+            <li>Historical weather data from 1946 to present (where available)</li>
+            <li>Current weather observations</li>
+            <li>Access to data from weather stations across 8 Australian states and territories</li>
+            <li>API access through subscription tiers (Free, Pro, Enterprise)</li>
+        </ul>
+
+        <h2>3. Account Registration</h2>
+        
+        <h3>3.1 Account Creation</h3>
+        <p>To use the Service, you must:</p>
+        <ul>
+            <li>Provide accurate, current, and complete information during registration</li>
+            <li>Maintain and promptly update your account information</li>
+            <li>Maintain the security of your account credentials</li>
+            <li>Be at least 18 years old or have parental consent</li>
+        </ul>
+
+        <h3>3.2 Account Security</h3>
+        <p>You are responsible for:</p>
+        <ul>
+            <li>All activities that occur under your account</li>
+            <li>Maintaining the confidentiality of your API keys</li>
+            <li>Notifying us immediately of any unauthorized use</li>
+        </ul>
+
+        <h2>4. API Usage & Limits</h2>
+        
+        <h3>4.1 Subscription Tiers</h3>
+        <p>Our Service is provided under different subscription tiers:</p>
+        <ul>
+            <li><strong>Free:</strong> 100 requests per month</li>
+            <li><strong>Pro:</strong> 5,000 requests per month ($29/month)</li>
+            <li><strong>Enterprise:</strong> Custom limits and pricing</li>
+        </ul>
+
+        <h3>4.2 Rate Limits</h3>
+        <p>You agree to comply with rate limits associated with your subscription tier. Excessive requests may result in temporary or permanent suspension of access.</p>
+
+        <h3>4.3 Fair Use</h3>
+        <p>You agree not to:</p>
+        <ul>
+            <li>Abuse or circumvent rate limits or quotas</li>
+            <li>Make unnecessary or redundant API calls</li>
+            <li>Attempt to overwhelm our infrastructure</li>
+            <li>Share API keys across multiple applications or users</li>
+        </ul>
+
+        <h2>5. Acceptable Use Policy</h2>
+        
+        <p>You agree NOT to use the Service to:</p>
+        <ul>
+            <li>Violate any laws or regulations</li>
+            <li>Infringe upon intellectual property rights</li>
+            <li>Transmit harmful code, viruses, or malware</li>
+            <li>Attempt to gain unauthorized access to our systems</li>
+            <li>Reverse engineer or attempt to extract our source code</li>
+            <li>Resell or redistribute our data without permission</li>
+            <li>Use the Service in any way that could damage or impair it</li>
+            <li>Scrape, crawl, or index the Service using automated means</li>
+        </ul>
+
+        <h2>6. Data Usage & Ownership</h2>
+        
+        <h3>6.1 Data Source</h3>
+        <p>All weather data is sourced from the Australian Bureau of Meteorology (BOM). We do not claim ownership of this data but provide it as a service.</p>
+
+        <h3>6.2 Commercial Use</h3>
+        <p>You may use the data obtained through our Service for commercial purposes, subject to:</p>
+        <ul>
+            <li>Compliance with your subscription tier limits</li>
+            <li>Proper attribution when required</li>
+            <li>Not redistributing raw data without our explicit permission</li>
+        </ul>
+
+        <h3>6.3 Data Accuracy</h3>
+        <p>While we strive to provide accurate data:</p>
+        <ul>
+            <li>Data is provided "as is" from BOM sources</li>
+            <li>We make no warranties about data accuracy or completeness</li>
+            <li>Historical data availability varies by location and time period</li>
+        </ul>
+
+        <h2>7. Payment & Billing</h2>
+        
+        <h3>7.1 Subscription Fees</h3>
+        <p>Paid subscriptions are billed monthly in advance. Prices are subject to change with 30 days notice.</p>
+
+        <h3>7.2 Payment Method</h3>
+        <p>Payments are processed securely through Stripe. You authorize us to charge your payment method.</p>
+
+        <h3>7.3 Refunds</h3>
+        <p>Subscription fees are non-refundable except as required by law or at our sole discretion.</p>
+
+        <h3>7.4 Cancellation</h3>
+        <p>You may cancel your subscription at any time. Cancellation takes effect at the end of the current billing period.</p>
+
+        <h2>8. Intellectual Property</h2>
+        
+        <p>The Service, including its design, features, and functionality, is owned by Fetcha Weather and protected by copyright, trademark, and other intellectual property laws.</p>
+
+        <h2>9. Service Availability</h2>
+        
+        <h3>9.1 Uptime</h3>
+        <ul>
+            <li><strong>Free Tier:</strong> Best effort, no SLA</li>
+            <li><strong>Pro Tier:</strong> 99.9% uptime SLA</li>
+            <li><strong>Enterprise:</strong> Custom SLA available</li>
+        </ul>
+
+        <h3>9.2 Maintenance</h3>
+        <p>We reserve the right to perform scheduled maintenance with advance notice when possible.</p>
+
+        <h2>10. Limitation of Liability</h2>
+        
+        <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW:</p>
+        <ul>
+            <li>THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND</li>
+            <li>WE ARE NOT LIABLE FOR ANY INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES</li>
+            <li>OUR TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT YOU PAID IN THE LAST 12 MONTHS</li>
+            <li>WE ARE NOT RESPONSIBLE FOR DECISIONS MADE BASED ON DATA FROM OUR SERVICE</li>
+        </ul>
+
+        <h2>11. Indemnification</h2>
+        
+        <p>You agree to indemnify and hold harmless Fetcha Weather from any claims, losses, or damages arising from:</p>
+        <ul>
+            <li>Your use of the Service</li>
+            <li>Violation of these Terms</li>
+            <li>Violation of any third-party rights</li>
+        </ul>
+
+        <h2>12. Termination</h2>
+        
+        <p>We may terminate or suspend your account immediately, without notice, for:</p>
+        <ul>
+            <li>Violation of these Terms</li>
+            <li>Fraudulent or illegal activity</li>
+            <li>Non-payment of fees</li>
+            <li>At our sole discretion</li>
+        </ul>
+
+        <p>Upon termination:</p>
+        <ul>
+            <li>Your access to the Service will cease immediately</li>
+            <li>You must stop using all API keys</li>
+            <li>Paid subscriptions are non-refundable unless required by law</li>
+        </ul>
+
+        <h2>13. Changes to Terms</h2>
+        
+        <p>We reserve the right to modify these Terms at any time. We will notify you of changes by:</p>
+        <ul>
+            <li>Posting the new Terms with an updated "Last Updated" date</li>
+            <li>Sending email notification for material changes</li>
+        </ul>
+        <p>Continued use of the Service after changes constitutes acceptance of the new Terms.</p>
+
+        <h2>14. Privacy</h2>
+        
+        <p>Your privacy is important to us. Please review our <a href="privacy.html">Privacy Policy</a> to understand how we collect, use, and protect your information.</p>
+
+        <h2>15. Governing Law</h2>
+        
+        <p>These Terms are governed by the laws of Queensland, Australia. Any disputes will be resolved in the courts of Queensland.</p>
+
+        <h2>16. Contact Information</h2>
+        
+        <p>For questions about these Terms, contact us at:</p>
+        <ul>
+            <li>Email: <a href="mailto:hello@fetchaweather.com">hello@fetchaweather.com</a></li>
+        </ul>
+
+        <h2>17. Severability</h2>
+        
+        <p>If any provision of these Terms is found to be unenforceable, the remaining provisions will remain in full effect.</p>
+
+        <h2>18. Entire Agreement</h2>
+        
+        <p>These Terms, together with our Privacy Policy, constitute the entire agreement between you and Fetcha Weather regarding the Service.</p>
+
+        <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+        <p><strong>By using Fetcha Weather, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.</strong></p>
+
+        <p style="margin-top: 2rem;">
+            <a href="index.html">← Back to Home</a> | 
+            <a href="privacy.html">Privacy Policy</a> | 
+            <a href="docs.html">API Documentation</a>
+        </p>
+    </div>
+</body>
+</html>

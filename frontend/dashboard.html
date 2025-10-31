@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fetcha — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20251027" />
+  <link rel="stylesheet" href="css/dashboard.css?v=20251027" />
+  <script>
+    window.CAMOUFOX_API_BASE = 'http://127.0.0.1:8000';
+    window.API_BASE = window.CAMOUFOX_API_BASE;
+  </script>
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="logo">
+            <svg width="100" height="30" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+              <text x="10" y="40" font-family="Arial, sans-serif" font-size="36" font-weight="500" fill="#2c3e50">Fetcha</text>
+              <svg x="124" y="23" width="18" height="20" viewBox="0 0 24 24" fill="none" stroke="#2c3e50" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+              </svg>
+            </svg>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="user-menu">
+            <button id="userMenuBtn" class="user-menu-btn">
+              <span id="userName">Loading...</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+            </button>
+            <div id="userDropdown" class="user-dropdown hidden">
+              <div class="user-info">
+                <div class="user-name" id="userNameFull">Loading...</div>
+                <div class="user-email" id="userEmail">Loading...</div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <button id="logoutBtn" class="dropdown-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16,17 21,12 16,7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <div class="dashboard-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+          <div class="welcome-content">
+            <h2>Welcome back!</h2>
+            <p>Manage your web scraping projects and API keys</p>
+          </div>
+          <button id="newProjectBtn" class="new-project-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Project
+          </button>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="projects-section">
+          <div class="section-header">
+            <h3>Your Projects</h3>
+            <div class="project-count">
+              <span id="projectCount">0</span> projects
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div id="projectsLoading" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading your projects...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div id="emptyState" class="empty-state hidden">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+              </svg>
+            </div>
+            <h4>No projects yet</h4>
+            <p>Create your first project to start extracting data from websites</p>
+            <button id="createFirstProjectBtn" class="create-first-btn">Create Your First Project</button>
+          </div>
+
+          <!-- Projects Grid -->
+          <div id="projectsGrid" class="projects-grid hidden">
+            <!-- Project cards will be dynamically inserted here -->
+          </div>
+        </section>
+
+        <!-- Usage Stats Section -->
+        <section class="stats-section">
+          <div class="section-header">
+            <h3>Usage Overview</h3>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="totalRequests">0</div>
+                <div class="stat-label">Total Requests</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <rect x="7" y="7" width="10" height="10" rx="1" ry="1"></rect>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="activeProjects">0</div>
+                <div class="stat-label">Active Projects</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="thisMonth">0</div>
+                <div class="stat-label">This Month</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Status Messages -->
+  <div id="statusMessage" class="status-message hidden"></div>
+
+  <!-- Progress Modal for Extraction -->
+  <div id="extractionProgressModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeProgressModal()"></div>
+    <div class="modal-content progress-modal-content">
+      <div class="modal-header">
+        <h3>Extraction in Progress</h3>
+        <button onclick="closeProgressModal()" class="close-btn">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Progress Indicator -->
+        <div id="phaseIndicator" class="phase-indicator">
+          Phase <span id="currentPhase">1</span> of 2
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+          </div>
+          <div id="progressPercentage" class="progress-percentage">0%</div>
+        </div>
+        
+        <!-- Status Message -->
+        <div id="statusMessage" class="status-message-modal">
+          Initializing extraction...
+        </div>
+        
+        <!-- Progress Log -->
+        <div class="progress-log-container">
+          <h4>Progress Log:</h4>
+          <div id="progressLog" class="progress-log"></div>
+        </div>
+        
+        <!-- Timer -->
+        <div class="extraction-timer">
+          <strong>Elapsed Time:</strong> <span id="elapsedTimer">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/shared.js?v=20251027"></script>
+  <script src="js/dashboard.js?v=20251027b"></script>
+</body>
+</html>
