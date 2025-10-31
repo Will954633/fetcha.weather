@@ -117,9 +117,14 @@ class ProductionConfig(Config):
     VERIFY_EMAIL_URL = f"{FRONTEND_URL}/verify-email"
     RESET_PASSWORD_URL = f"{FRONTEND_URL}/reset-password"
     
-    # Production CORS - Allow Netlify and custom domains
-    default_origins = 'https://weather.fetcha.com,https://*.netlify.app'
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', default_origins).split(',')
+    # Production CORS - Allow multiple origins
+    # Split comma-separated list from environment variable
+    cors_env = os.environ.get('CORS_ORIGINS', '')
+    if cors_env:
+        CORS_ORIGINS = [origin.strip() for origin in cors_env.split(',') if origin.strip()]
+    else:
+        # Default fallback
+        CORS_ORIGINS = ['https://weather.fetcha.com']
     
     # Production security
     SESSION_COOKIE_SECURE = True
