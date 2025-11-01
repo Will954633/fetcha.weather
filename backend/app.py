@@ -86,7 +86,7 @@ def create_app(config_name=None):
         """API information endpoint"""
         return jsonify({
             'name': 'Fetcha Weather API',
-            'version': '1.0.0',
+            'version': '1.0.1',
             'description': 'Australian Historical Weather Data API',
             'endpoints': {
                 'auth': '/api/auth',
@@ -95,6 +95,22 @@ def create_app(config_name=None):
                 'usage': '/api/usage'
             },
             'documentation': 'https://weather.fetcha.com/docs'
+        }), 200
+    
+    # Debug endpoint to list all routes
+    @app.route('/api/routes', methods=['GET'])
+    def list_routes():
+        """List all registered routes (for debugging)"""
+        routes = []
+        for rule in app.url_map.iter_rules():
+            routes.append({
+                'endpoint': rule.endpoint,
+                'methods': list(rule.methods),
+                'path': str(rule)
+            })
+        return jsonify({
+            'total_routes': len(routes),
+            'routes': sorted(routes, key=lambda x: x['path'])
         }), 200
     
     app.logger.info(f'Fetcha Weather API initialized in {config_name or "default"} mode')
