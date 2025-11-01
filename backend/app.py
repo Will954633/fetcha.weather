@@ -39,9 +39,10 @@ def create_app(config_name=None):
     config = get_config(config_name)
     app.config.from_object(config)
     
-    # Debug: Log CORS origins
+    # Debug: Log CORS origins and database URI
     print(f"DEBUG: CORS_ORIGINS = {config.CORS_ORIGINS}")
     print(f"DEBUG: CORS_ORIGINS type = {type(config.CORS_ORIGINS)}")
+    print(f"DEBUG: DATABASE_URI = {app.config.get('SQLALCHEMY_DATABASE_URI', 'NOT SET')[:50]}...")  # First 50 chars only for security
     
     # Initialize extensions with explicit CORS configuration
     CORS(app, 
