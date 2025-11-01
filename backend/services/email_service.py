@@ -79,14 +79,17 @@ class EmailService:
             message.attach(html_part)
             
             # Send email - use SSL or STARTTLS based on configuration
+            # Add timeout to prevent hanging connections
+            timeout = 10  # 10 second timeout for SMTP operations
+            
             if self.smtp_use_ssl:
                 # Use SSL (port 465) - for GoDaddy/SecureServer
-                with smtplib.SMTP_SSL(self.smtp_server, self.smtp_port) as server:
+                with smtplib.SMTP_SSL(self.smtp_server, self.smtp_port, timeout=timeout) as server:
                     server.login(self.smtp_username, self.smtp_password)
                     server.sendmail(self.email_from, to_email, message.as_string())
             else:
                 # Use STARTTLS (port 587) - for Gmail
-                with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                with smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=timeout) as server:
                     server.starttls()
                     server.login(self.smtp_username, self.smtp_password)
                     server.sendmail(self.email_from, to_email, message.as_string())
