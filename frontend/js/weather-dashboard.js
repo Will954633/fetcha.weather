@@ -1,6 +1,6 @@
 /**
  * Fetcha Weather - Dashboard JavaScript
- * Version: v1.0 • Updated: 2025-10-28 19:41 AEST (Brisbane)
+ * Version: v1.1 • Updated: 2025-11-01 19:27 AEST (Brisbane)
  * 
  * Handles all dashboard functionality including:
  * - User session management
@@ -8,6 +8,8 @@
  * - Weather queries
  * - Usage statistics
  * - UI interactions
+ * 
+ * Fixed: Added null checks for DOM elements to prevent initialization errors
  */
 
 // ================================
@@ -641,27 +643,40 @@ function renderRecentQueries(queries) {
 // ================================
 
 function setupEventListeners() {
+  // Helper function to safely add event listener
+  const addListener = (id, event, handler) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener(event, handler);
+    } else {
+      console.warn(`Element not found: ${id}`);
+    }
+  };
+  
   // User menu
-  document.getElementById('userMenuBtn').addEventListener('click', toggleUserMenu);
-  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+  addListener('userMenuBtn', 'click', toggleUserMenu);
+  addListener('logoutBtn', 'click', handleLogout);
   
   // API Key generation
-  document.getElementById('generateKeyBtn').addEventListener('click', openGenerateKeyModal);
-  document.getElementById('generateFirstKeyBtn').addEventListener('click', openGenerateKeyModal);
-  document.getElementById('confirmGenerateKeyBtn').addEventListener('click', generateApiKey);
-  document.getElementById('copyNewKeyBtn').addEventListener('click', copyNewKey);
-  document.getElementById('closeShowKeyBtn').addEventListener('click', closeShowKeyModal);
+  addListener('generateKeyBtn', 'click', openGenerateKeyModal);
+  addListener('generateFirstKeyBtn', 'click', openGenerateKeyModal);
+  addListener('confirmGenerateKeyBtn', 'click', generateApiKey);
+  addListener('copyNewKeyBtn', 'click', copyNewKey);
+  addListener('closeShowKeyBtn', 'click', closeShowKeyModal);
   
   // Weather query
-  document.getElementById('testQueryBtn').addEventListener('click', runWeatherQuery);
-  document.getElementById('clearQueryBtn').addEventListener('click', clearQueryForm);
-  document.getElementById('copyResultsBtn').addEventListener('click', copyResults);
-  document.getElementById('downloadResultsBtn').addEventListener('click', downloadResults);
+  addListener('testQueryBtn', 'click', runWeatherQuery);
+  addListener('clearQueryBtn', 'click', clearQueryForm);
+  addListener('copyResultsBtn', 'click', copyResults);
+  // Note: downloadResultsBtn uses inline onclick handlers in HTML
   
   // Click outside to close dropdowns
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.user-menu')) {
-      document.getElementById('userDropdown').classList.add('hidden');
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) {
+        dropdown.classList.add('hidden');
+      }
     }
   });
 }
