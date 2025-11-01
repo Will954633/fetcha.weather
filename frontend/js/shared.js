@@ -280,8 +280,8 @@ function debounce(func, wait) {
   };
 }
 
-// Generate random API key
-function generateApiKey() {
+// Generate random API key (utility function)
+function generateRandomKey() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = 'cfx_';
   for (let i = 0; i < 32; i++) {
@@ -330,7 +330,7 @@ window.CamoufoxUtils = {
   getDemoData,
   clearDemoData,
   debounce,
-  generateApiKey,
+  generateRandomKey,
   truncateText,
   onClickOutside
 };
