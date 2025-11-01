@@ -482,21 +482,97 @@ async function copyResults() {
   }
 }
 
-function downloadResults() {
+function downloadResults(format = 'json') {
   if (!lastQueryResult) return;
   
-  const jsonStr = JSON.stringify(lastQueryResult, null, 2);
-  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const timestamp = new Date().toISOString().split('T')[0];
+  const location = lastQueryResult.location || 'weather-data';
+  const filename = `${location.replace(/[^a-z0-9]/gi, '_')}_${timestamp}`;
+  
+  let content, mimeType, extension;
+  
+  switch(format) {
+    case 'csv':
+      content = convertToCSV(lastQueryResult.data);
+      mimeType = 'text/csv';
+      extension = 'csv';
+      break;
+    case 'excel':
+      content = convertToExcel(lastQueryResult.data);
+      mimeType = 'application/vnd.ms-excel';
+      extension = 'xls';
+      break;
+    case 'json':
+    default:
+      content = JSON.stringify(lastQueryResult, null, 2);
+      mimeType = 'application/json';
+      extension = 'json';
+  }
+  
+  const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `weather-data-${new Date().toISOString().split('T')[0]}.json`;
+  a.download = `${filename}.${extension}`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   
-  showStatus('Results downloaded!', 'success');
+  showStatus(`Data downloaded as ${extension.toUpperCase()}!`, 'success');
+}
+
+function convertToCSV(data) {
+  if (!data || data.length === 0) return '';
+  
+  // Get headers from first object
+  const headers = Object.keys(data[0]);
+  
+  // Create CSV header row
+  const csv = [headers.join(',')];
+  
+  // Add data rows
+  data.forEach(row => {
+    const values = headers.map(header => {
+      const value = row[header];
+      // Escape commas and quotes in values
+      if (value === null || value === undefined) return '';
+      const stringValue = String(value);
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    });
+    csv.push(values.join(','));
+  });
+  
+  return csv.join('\n');
+}
+
+function convertToExcel(data) {
+  if (!data || data.length === 0) return '';
+  
+  // Create simple HTML table format (opens in Excel)
+  const headers = Object.keys(data[0]);
+  
+  let html = '<table border="1">\n';
+  html += '<thead><tr>';
+  headers.forEach(h => {
+    html += `<th>${formatHeader(h)}</th>`;
+  });
+  html += '</tr></thead>\n<tbody>\n';
+  
+  data.forEach(row => {
+    html += '<tr>';
+    headers.forEach(header => {
+      const value = row[header] || '';
+      html += `<td>${value}</td>`;
+    });
+    html += '</tr>\n';
+  });
+  
+  html += '</tbody>\n</table>';
+  return html;
 }
 
 // ================================
