@@ -159,26 +159,37 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       throw new Error(data.error || 'Signup failed');
     }
     
-    // For development, we get the verification token in response
-    if (data.verification_token) {
-      showStatus('Account created! Redirecting to email verification...', 'success');
-      
-      // Store email and token for verification page
-      localStorage.setItem('verify_email', email);
-      localStorage.setItem('verify_token', data.verification_token);
-      
-      // Redirect to verification page
-      setTimeout(() => {
-        window.location.href = 'verify-email.html';
-      }, 2000);
-    } else {
+    // Check email send status
+    if (data.email_sent === true) {
+      // Email was sent successfully - redirect to verification
       showStatus('Account created! Please check your email to verify your account.', 'success');
       
-      // Switch to login tab after a delay
+      if (data.verification_token) {
+        // Store email and token for verification page
+        localStorage.setItem('verify_email', email);
+        localStorage.setItem('verify_token', data.verification_token);
+        
+        // Redirect to verification page
+        setTimeout(() => {
+          window.location.href = 'verify-email.html';
+        }, 2000);
+      } else {
+        // Switch to login tab after a delay
+        setTimeout(() => {
+          switchTab('login');
+          document.getElementById('loginEmail').value = email;
+        }, 3000);
+      }
+    } else {
+      // Email not sent (temporarily unavailable) - allow direct login
+      showStatus('Account created successfully! You can now sign in.', 'success');
+      
+      // Switch to login tab and pre-fill email
       setTimeout(() => {
         switchTab('login');
         document.getElementById('loginEmail').value = email;
-      }, 3000);
+        document.getElementById('loginPassword').focus();
+      }, 2000);
     }
     
   } catch (error) {
