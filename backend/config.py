@@ -14,9 +14,15 @@ class Config:
     DEBUG = False
     TESTING = False
     
-    # Database
-    DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'database', 'weather.db')
-    SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
+    # Database - Use PostgreSQL if DATABASE_URL is set (Railway), otherwise SQLite  
+    if os.environ.get('DATABASE_URL'):
+        # Production: Use PostgreSQL from Railway
+        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+        DATABASE_PATH = None
+    else:
+        # Development: Use SQLite
+        DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'database', 'weather.db')
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # JWT Authentication
