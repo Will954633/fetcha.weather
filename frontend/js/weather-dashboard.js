@@ -295,7 +295,7 @@ async function generateApiKey() {
     }
     
     const data = await response.json();
-    const newKey = data.api_key.key;
+    const newKey = data.key_value;  // Backend returns key_value, not api_key.key
     
     closeGenerateKeyModal();
     showNewApiKey(newKey);
