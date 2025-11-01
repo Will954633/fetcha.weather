@@ -112,11 +112,13 @@ class User:
                 }
             
             # Check if email is verified
-            if not user['email_verified']:
-                return {
-                    'success': False,
-                    'error': 'Email not verified. Please check your inbox.'
-                }
+            # TEMPORARILY DISABLED - Email service not working, allow login without verification
+            # TODO: Re-enable when email service is configured
+            # if not user['email_verified']:
+            #     return {
+            #         'success': False,
+            #         'error': 'Email not verified. Please check your inbox.'
+            #     }
             
             # Reset login attempts
             cursor.execute('''
