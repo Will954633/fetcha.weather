@@ -216,10 +216,32 @@ function hideStatus() {
 // Check if already logged in
 // ================================
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   const token = localStorage.getItem('jwt_token');
+  
+  // Only redirect if we have a token AND it's valid
   if (token) {
-    // Already logged in, redirect to dashboard
-    window.location.href = 'weather-dashboard.html';
+    try {
+      // Validate token with backend
+      const response = await fetch(`${window.API_BASE}/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        // Token is valid, redirect to dashboard
+        window.location.href = 'weather-dashboard.html';
+      } else {
+        // Token is invalid, clear it
+        console.log('Invalid token found, clearing...');
+        localStorage.removeItem('jwt_token');
+      }
+    } catch (error) {
+      // Network error or token validation failed, clear token
+      console.error('Token validation error:', error);
+      localStorage.removeItem('jwt_token');
+    }
   }
 });
