@@ -1,6 +1,7 @@
 """
 Fetcha Weather - Backend Configuration
-Version: v1.0 • Updated: 2025-10-28 19:01 AEST (Brisbane)
+Version: v1.0 • Updated: 2025-11-01 21:47 AEST (Brisbane)
+Force trigger Railway rebuild with PostgreSQL fix
 """
 
 import os
