@@ -113,22 +113,34 @@ def signup():
         # Log the event
         current_app.logger.info(f'New user registered: {email}')
         
-        # Send verification email
-        email_service = EmailService(current_app.config)
-        email_result = email_service.send_verification_email(
-            to_email=email,
-            verification_token=result['verification_token'],
-            user_name=full_name
-        )
-        
-        if not email_result['success']:
-            current_app.logger.error(f'Failed to send verification email to {email}: {email_result.get("error")}')
-            # Still return success for user creation, but note email issue
+        # Try to send verification email (with timeout protection)
+        try:
+            email_service = EmailService(current_app.config)
+            email_result = email_service.send_verification_email(
+                to_email=email,
+                verification_token=result['verification_token'],
+                user_name=full_name
+            )
+            
+            if not email_result['success']:
+                current_app.logger.error(f'Failed to send verification email to {email}: {email_result.get("error")}')
+                # Still return success for user creation, but note email issue
+                return jsonify({
+                    'success': True,
+                    'message': 'Account created successfully! Email verification is temporarily unavailable.',
+                    'user': result['user'],
+                    'email_sent': False,
+                    'verification_token': result['verification_token']  # Include token for manual verification
+                }), 201
+        except Exception as email_error:
+            current_app.logger.error(f'Email service error for {email}: {str(email_error)}')
+            # Return success anyway - email is not critical for signup
             return jsonify({
                 'success': True,
-                'message': 'Account created but verification email failed to send. Please request a new verification email.',
+                'message': 'Account created successfully! Email verification is temporarily unavailable.',
                 'user': result['user'],
-                'email_sent': False
+                'email_sent': False,
+                'verification_token': result['verification_token']  # Include token for manual verification  
             }), 201
         
         return jsonify({
