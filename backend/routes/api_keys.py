@@ -39,7 +39,7 @@ def list_api_keys():
         
         return jsonify({
             'success': True,
-            'keys': keys,
+            'api_keys': keys,  # Changed from 'keys' to 'api_keys' to match frontend
             'total': len(keys)
         }), 200
         
