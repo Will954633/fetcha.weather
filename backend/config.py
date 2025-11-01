@@ -17,7 +17,11 @@ class Config:
     # Database - Use PostgreSQL if DATABASE_URL is set (Railway), otherwise SQLite  
     if os.environ.get('DATABASE_URL'):
         # Production: Use PostgreSQL from Railway
-        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+        # Fix for SQLAlchemy 1.4+: convert postgres:// to postgresql://
+        database_url = os.environ.get('DATABASE_URL')
+        if database_url.startswith('postgres://'):
+            database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        SQLALCHEMY_DATABASE_URI = database_url
         DATABASE_PATH = None
     else:
         # Development: Use SQLite
