@@ -1,6 +1,7 @@
 """
 Fetcha Weather - Main Flask Application
-Version: v1.0 • Updated: 2025-10-28 19:16 AEST (Brisbane)
+Version: v1.0 • Updated: 2025-11-01 19:38 AEST (Brisbane)
+Force redeploy to fix /api/auth/me 404 issue
 """
 
 from flask import Flask, jsonify, request
