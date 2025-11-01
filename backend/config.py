@@ -130,6 +130,19 @@ class ProductionConfig(Config):
     VERIFY_EMAIL_URL = f"{FRONTEND_URL}/verify-email"
     RESET_PASSWORD_URL = f"{FRONTEND_URL}/reset-password"
     
+    # Production Database - MUST use PostgreSQL from Railway
+    # Fix for SQLAlchemy 1.4+: convert postgres:// to postgresql://
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        if database_url.startswith('postgres://'):
+            database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        SQLALCHEMY_DATABASE_URI = database_url
+        DATABASE_PATH = None
+    else:
+        # Fallback (should never happen in production)
+        DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'database', 'weather.db')
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
+    
     # Production CORS - Allow multiple origins
     # Split comma-separated list from environment variable
     cors_env = os.environ.get('CORS_ORIGINS', '')
