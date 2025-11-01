@@ -110,8 +110,12 @@ def signup():
         if not result['success']:
             return jsonify(result), 400
         
+        # Create JWT tokens for auto-login
+        access_token = create_access_token(identity=result['user']['id'])
+        refresh_token = create_refresh_token(identity=result['user']['id'])
+        
         # Log the event
-        current_app.logger.info(f'New user registered: {email}')
+        current_app.logger.info(f'New user registered and auto-logged in: {email}')
         
         # Try to send verification email (with timeout protection)
         try:
@@ -127,27 +131,34 @@ def signup():
                 # Still return success for user creation, but note email issue
                 return jsonify({
                     'success': True,
-                    'message': 'Account created successfully! Email verification is temporarily unavailable.',
+                    'message': 'Welcome! Redirecting to dashboard...',
+                    'access_token': access_token,
+                    'refresh_token': refresh_token,
                     'user': result['user'],
                     'email_sent': False,
-                    'verification_token': result['verification_token']  # Include token for manual verification
+                    'auto_login': True
                 }), 201
         except Exception as email_error:
             current_app.logger.error(f'Email service error for {email}: {str(email_error)}')
             # Return success anyway - email is not critical for signup
             return jsonify({
                 'success': True,
-                'message': 'Account created successfully! Email verification is temporarily unavailable.',
+                'message': 'Welcome! Redirecting to dashboard...',
+                'access_token': access_token,
+                'refresh_token': refresh_token,
                 'user': result['user'],
                 'email_sent': False,
-                'verification_token': result['verification_token']  # Include token for manual verification  
+                'auto_login': True
             }), 201
         
         return jsonify({
             'success': True,
-            'message': 'User created successfully. Please check your email to verify your account.',
+            'message': 'Welcome! Redirecting to dashboard...',
+            'access_token': access_token,
+            'refresh_token': refresh_token,
             'user': result['user'],
-            'email_sent': True
+            'email_sent': True,
+            'auto_login': True
         }), 201
         
     except Exception as e:

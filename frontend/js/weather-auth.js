@@ -159,36 +159,24 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       throw new Error(data.error || 'Signup failed');
     }
     
-    // Check email send status
-    if (data.email_sent === true) {
-      // Email was sent successfully - redirect to verification
+    // Check if auto-login is enabled (new feature for MVP testing)
+    if (data.auto_login && data.access_token) {
+      // Store JWT token for auto-login
+      localStorage.setItem('jwt_token', data.access_token);
+      
+      showStatus(data.message || 'Welcome! Redirecting to dashboard...', 'success');
+      
+      // Redirect to dashboard immediately
+      setTimeout(() => {
+        window.location.href = 'weather-dashboard.html';
+      }, 1000);
+    } else {
+      // Fallback: traditional email verification flow
       showStatus('Account created! Please check your email to verify your account.', 'success');
       
-      if (data.verification_token) {
-        // Store email and token for verification page
-        localStorage.setItem('verify_email', email);
-        localStorage.setItem('verify_token', data.verification_token);
-        
-        // Redirect to verification page
-        setTimeout(() => {
-          window.location.href = 'verify-email.html';
-        }, 2000);
-      } else {
-        // Switch to login tab after a delay
-        setTimeout(() => {
-          switchTab('login');
-          document.getElementById('loginEmail').value = email;
-        }, 3000);
-      }
-    } else {
-      // Email not sent (temporarily unavailable) - allow direct login
-      showStatus('Account created successfully! You can now sign in.', 'success');
-      
-      // Switch to login tab and pre-fill email
       setTimeout(() => {
         switchTab('login');
         document.getElementById('loginEmail').value = email;
-        document.getElementById('loginPassword').focus();
       }, 2000);
     }
     
