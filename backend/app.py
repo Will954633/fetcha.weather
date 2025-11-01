@@ -155,12 +155,14 @@ def register_blueprints(app):
     from routes.api_keys import api_keys_bp
     from routes.usage import usage_bp
     from routes.weather import weather_bp
+    from routes.admin import admin_bp
     
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(api_keys_bp, url_prefix='/api/keys')
     app.register_blueprint(usage_bp, url_prefix='/api/usage')
     app.register_blueprint(weather_bp, url_prefix='/api/weather')
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
     
     app.logger.info('All blueprints registered')
 
