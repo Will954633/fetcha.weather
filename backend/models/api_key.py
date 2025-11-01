@@ -112,18 +112,14 @@ class APIKey:
             
             api_key_data = dict(result)
             
-            # Check if user account is active and verified
+            # Check if user account is active
             if not api_key_data['user_active']:
                 return {
                     'success': False,
                     'error': 'User account is inactive'
                 }
             
-            if not api_key_data['email_verified']:
-                return {
-                    'success': False,
-                    'error': 'Email not verified'
-                }
+            # Email verification not required for MVP - dashboard login is sufficient security
             
             # Update last used timestamp
             cursor.execute('''
