@@ -284,11 +284,10 @@
 
   <!-- Generate API Key Modal -->
   <div id="generateKeyModal" class="modal hidden">
-    <div class="modal-overlay" onclick="closeGenerateKeyModal()"></div>
-    <div class="modal-content">
+    <div class="modal-dialog">
       <div class="modal-header">
         <h3>Generate API Key</h3>
-        <button onclick="closeGenerateKeyModal()" class="close-btn">×</button>
+        <button type="button" onclick="closeGenerateKeyModal()" class="close-btn">×</button>
       </div>
       
       <div class="modal-body">
@@ -297,11 +296,11 @@
           <input type="text" id="keyName" placeholder="e.g., Production API, Development" />
           <p class="input-hint">Give your key a name to help you identify it later</p>
         </div>
-
-        <div class="form-actions">
-          <button id="confirmGenerateKeyBtn" class="btn-primary">Generate Key</button>
-          <button onclick="closeGenerateKeyModal()" class="btn-secondary">Cancel</button>
-        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeGenerateKeyModal()">Cancel</button>
+        <button type="button" class="btn-primary" id="confirmGenerateKeyBtn">Generate Key</button>
       </div>
     </div>
   </div>

@@ -1149,18 +1149,22 @@
 }
 
 /* Modal Overlay and Container */
-.modal-overlay {
+.modal {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
+  z-index: 2000;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
   animation: fadeIn 0.2s ease-out;
+}
+
+.modal:not(.hidden) {
+  display: flex;
 }
 
 @keyframes fadeIn {
@@ -1172,7 +1176,7 @@
   }
 }
 
-.modal {
+.modal-dialog {
   background: var(--card);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
@@ -1197,12 +1201,32 @@
 .modal-header {
   padding: 24px 24px 16px;
   border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
+  color: var(--text-primary);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  line-height: 1;
+  transition: var(--transition);
+}
+
+.close-btn:hover {
   color: var(--text-primary);
 }
 
