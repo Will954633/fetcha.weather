@@ -117,39 +117,8 @@ def signup():
         # Log the event
         current_app.logger.info(f'New user registered and auto-logged in: {email}')
         
-        # Try to send verification email (with timeout protection)
-        try:
-            email_service = EmailService(current_app.config)
-            email_result = email_service.send_verification_email(
-                to_email=email,
-                verification_token=result['verification_token'],
-                user_name=full_name
-            )
-            
-            if not email_result['success']:
-                current_app.logger.error(f'Failed to send verification email to {email}: {email_result.get("error")}')
-                # Still return success for user creation, but note email issue
-                return jsonify({
-                    'success': True,
-                    'message': 'Welcome! Redirecting to dashboard...',
-                    'access_token': access_token,
-                    'refresh_token': refresh_token,
-                    'user': result['user'],
-                    'email_sent': False,
-                    'auto_login': True
-                }), 201
-        except Exception as email_error:
-            current_app.logger.error(f'Email service error for {email}: {str(email_error)}')
-            # Return success anyway - email is not critical for signup
-            return jsonify({
-                'success': True,
-                'message': 'Welcome! Redirecting to dashboard...',
-                'access_token': access_token,
-                'refresh_token': refresh_token,
-                'user': result['user'],
-                'email_sent': False,
-                'auto_login': True
-            }), 201
+        # Skip email sending for MVP - instant signup!
+        # TODO: Re-enable email verification when email service is properly configured
         
         return jsonify({
             'success': True,
@@ -157,7 +126,7 @@ def signup():
             'access_token': access_token,
             'refresh_token': refresh_token,
             'user': result['user'],
-            'email_sent': True,
+            'email_sent': False,
             'auto_login': True
         }), 201
         
