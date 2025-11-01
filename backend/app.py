@@ -13,7 +13,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from config import get_config
-from database.init_db import init_database
+from models import db
 
 
 def create_app(config_name=None):
@@ -53,16 +53,20 @@ def create_app(config_name=None):
          max_age=3600)
     jwt = JWTManager(app)
     
+    # Initialize SQLAlchemy
+    db.init_app(app)
+    
     # Setup logging
     setup_logging(app, config)
     
-    # Initialize database
-    try:
-        db_path = init_database(drop_existing=False)
-        app.logger.info(f'Database initialized: {db_path}')
-    except Exception as e:
-        app.logger.error(f'Database initialization failed: {str(e)}')
-        raise
+    # Create database tables
+    with app.app_context():
+        try:
+            db.create_all()
+            app.logger.info('Database tables created/verified successfully')
+        except Exception as e:
+            app.logger.error(f'Database initialization failed: {str(e)}')
+            raise
     
     # Register blueprints
     register_blueprints(app)

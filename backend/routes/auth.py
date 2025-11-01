@@ -6,16 +6,11 @@ Version: v1.0 • Updated: 2025-10-28 19:17 AEST (Brisbane)
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from email_validator import validate_email, EmailNotValidError
-from models.user import User
+from models import User
 from services.email_service import EmailService
-from config import get_config
 import re
 
 auth_bp = Blueprint('auth', __name__)
-
-# Get database path from config
-config = get_config()
-DB_PATH = config.DATABASE_PATH
 
 
 def validate_password(password):
@@ -104,8 +99,7 @@ def signup():
             }), 400
         
         # Create user
-        user_model = User(DB_PATH)
-        result = user_model.create(email, password, full_name)
+        result = User.create(email, password, full_name)
         
         if not result['success']:
             return jsonify(result), 400
@@ -166,8 +160,7 @@ def login():
         password = data['password']
         
         # Authenticate user
-        user_model = User(DB_PATH)
-        result = user_model.authenticate(email, password)
+        result = User.authenticate(email, password)
         
         if not result['success']:
             current_app.logger.warning(f'Failed login attempt for: {email}')
@@ -222,8 +215,7 @@ def verify_email():
         token = data['token']
         
         # Verify email
-        user_model = User(DB_PATH)
-        result = user_model.verify_email(token)
+        result = User.verify_email(token)
         
         if result['success']:
             current_app.logger.info(f'Email verified for user ID: {result["user"]["id"]}')
@@ -263,8 +255,7 @@ def resend_verification():
         email = data['email'].strip()
         
         # Resend verification
-        user_model = User(DB_PATH)
-        result = user_model.resend_verification(email)
+        result = User.resend_verification(email)
         
         if result['success']:
             current_app.logger.info(f'Verification email resent to: {email}')
@@ -325,8 +316,7 @@ def forgot_password():
         email = data['email'].strip()
         
         # Request password reset
-        user_model = User(DB_PATH)
-        result = user_model.request_password_reset(email)
+        result = User.request_password_reset(email)
         
         # Always return success to prevent email enumeration
         if 'reset_token' in result:
@@ -392,8 +382,7 @@ def reset_password():
             }), 400
         
         # Reset password
-        user_model = User(DB_PATH)
-        result = user_model.reset_password(token, new_password)
+        result = User.reset_password(token, new_password)
         
         if result['success']:
             current_app.logger.info('Password reset successfully')
@@ -422,8 +411,11 @@ def get_current_user():
     try:
         user_id = get_jwt_identity()
         
-        user_model = User(DB_PATH)
-        user = user_model.get_by_id(user_id)
+        user = User.get_by_id(user_id)
+        
+        # Convert to dict if it's a model instance
+        if user and hasattr(user, 'to_dict'):
+            user = user.to_dict()
         
         if not user:
             return jsonify({

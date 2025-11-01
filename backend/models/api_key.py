@@ -1,27 +1,60 @@
 """
-Fetcha Weather - API Key Model
-Version: v1.0 • Updated: 2025-10-28 19:03 AEST (Brisbane)
+Fetcha Weather - API Key Model (SQLAlchemy ORM)
+Version: v2.0 • Updated: 2025-01-11 20:56 AEST (Brisbane)
+Converted from SQLite3 to SQLAlchemy ORM for PostgreSQL compatibility
 """
 
-import sqlite3
 import secrets
 import hashlib
 from datetime import datetime
 from typing import Optional, Dict, Any, List
+from sqlalchemy.exc import IntegrityError
+
+# Import db from __init__.py will be handled at runtime to avoid circular imports
+from . import db
 
 
-class APIKey:
+class APIKey(db.Model):
     """API Key model for managing user API keys"""
     
-    def __init__(self, db_path: str):
-        self.db_path = db_path
+    __tablename__ = 'api_keys'
     
-    def _get_connection(self):
-        """Get database connection"""
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        conn.execute('PRAGMA foreign_keys = ON')
-        return conn
+    # Columns
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    key_value = db.Column(db.Text, unique=True, nullable=False)
+    key_hash = db.Column(db.Text, unique=True, nullable=False)
+    name = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    last_used = db.Column(db.DateTime, nullable=True)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    
+    # Relationships
+    usage_logs = db.relationship('Usage', backref='api_key', lazy='dynamic', cascade='all, delete-orphan')
+    
+    def to_dict(self, include_key_value=False):
+        """
+        Convert API key object to dictionary
+        
+        Args:
+            include_key_value: Include full key value
+            
+        Returns:
+            Dict representation of API key
+        """
+        api_key_dict = {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'last_used': self.last_used.isoformat() if self.last_used else None,
+            'is_active': self.is_active
+        }
+        
+        if include_key_value:
+            api_key_dict['key_value'] = self.key_value
+        
+        return api_key_dict
     
     @staticmethod
     def _generate_key() -> str:
@@ -33,7 +66,8 @@ class APIKey:
         """Hash an API key for storage"""
         return hashlib.sha256(key.encode()).hexdigest()
     
-    def create(self, user_id: int, name: Optional[str] = None) -> Dict[str, Any]:
+    @staticmethod
+    def create(user_id: int, name: Optional[str] = None) -> Dict[str, Any]:
         """
         Create a new API key for a user
         
@@ -44,42 +78,44 @@ class APIKey:
         Returns:
             Dict with API key data
         """
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        
         try:
             # Generate key
-            key_value = self._generate_key()
-            key_hash = self._hash_key(key_value)
+            key_value = APIKey._generate_key()
+            key_hash = APIKey._hash_key(key_value)
             
-            # Insert key
-            cursor.execute('''
-                INSERT INTO api_keys (user_id, key_value, key_hash, name)
-                VALUES (?, ?, ?, ?)
-            ''', (user_id, key_value, key_hash, name))
+            # Create API key instance
+            api_key = APIKey(
+                user_id=user_id,
+                key_value=key_value,
+                key_hash=key_hash,
+                name=name
+            )
             
-            key_id = cursor.lastrowid
-            conn.commit()
-            
-            # Get created key
-            cursor.execute('SELECT * FROM api_keys WHERE id = ?', (key_id,))
-            api_key = dict(cursor.fetchone())
+            # Add to session and commit
+            db.session.add(api_key)
+            db.session.commit()
             
             return {
                 'success': True,
-                'api_key': api_key,
+                'api_key': api_key.to_dict(),
                 'key_value': key_value  # Only returned once at creation
             }
             
-        except sqlite3.IntegrityError as e:
+        except IntegrityError as e:
+            db.session.rollback()
             return {
                 'success': False,
                 'error': f'Failed to create API key: {str(e)}'
             }
-        finally:
-            conn.close()
+        except Exception as e:
+            db.session.rollback()
+            return {
+                'success': False,
+                'error': str(e)
+            }
     
-    def validate(self, key_value: str) -> Dict[str, Any]:
+    @staticmethod
+    def validate(key_value: str) -> Dict[str, Any]:
         """
         Validate an API key and return associated user
         
@@ -89,31 +125,23 @@ class APIKey:
         Returns:
             Dict with validation result and user data
         """
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        
         try:
-            key_hash = self._hash_key(key_value)
+            key_hash = APIKey._hash_key(key_value)
             
-            cursor.execute('''
-                SELECT ak.*, u.email, u.tier, u.email_verified, u.is_active as user_active
-                FROM api_keys ak
-                JOIN users u ON ak.user_id = u.id
-                WHERE ak.key_hash = ? AND ak.is_active = 1
-            ''', (key_hash,))
+            # Join with User table to get user details
+            api_key = db.session.query(APIKey).join(APIKey.user).filter(
+                APIKey.key_hash == key_hash,
+                APIKey.is_active == True
+            ).first()
             
-            result = cursor.fetchone()
-            
-            if not result:
+            if not api_key:
                 return {
                     'success': False,
                     'error': 'Invalid API key'
                 }
             
-            api_key_data = dict(result)
-            
             # Check if user account is active
-            if not api_key_data['user_active']:
+            if not api_key.user.is_active:
                 return {
                     'success': False,
                     'error': 'User account is inactive'
@@ -122,25 +150,30 @@ class APIKey:
             # Email verification not required for MVP - dashboard login is sufficient security
             
             # Update last used timestamp
-            cursor.execute('''
-                UPDATE api_keys 
-                SET last_used = ? 
-                WHERE id = ?
-            ''', (datetime.now(), api_key_data['id']))
-            conn.commit()
+            api_key.last_used = datetime.utcnow()
+            db.session.commit()
             
-            # Remove key_value from response (we don't want to leak it)
-            api_key_data.pop('key_value', None)
+            # Build response with user data
+            api_key_data = api_key.to_dict()
+            api_key_data['email'] = api_key.user.email
+            api_key_data['tier'] = api_key.user.tier
+            api_key_data['email_verified'] = api_key.user.email_verified
+            api_key_data['user_active'] = api_key.user.is_active
             
             return {
                 'success': True,
                 'api_key': api_key_data
             }
             
-        finally:
-            conn.close()
+        except Exception as e:
+            db.session.rollback()
+            return {
+                'success': False,
+                'error': str(e)
+            }
     
-    def get_by_user(self, user_id: int, include_inactive: bool = False) -> List[Dict[str, Any]]:
+    @staticmethod
+    def get_by_user(user_id: int, include_inactive: bool = False) -> List[Dict[str, Any]]:
         """
         Get all API keys for a user
         
@@ -151,26 +184,23 @@ class APIKey:
         Returns:
             List of API key dictionaries with full key values
         """
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        
         try:
-            if include_inactive:
-                cursor.execute('SELECT * FROM api_keys WHERE user_id = ? ORDER BY created_at DESC', (user_id,))
-            else:
-                cursor.execute('SELECT * FROM api_keys WHERE user_id = ? AND is_active = 1 ORDER BY created_at DESC', (user_id,))
+            query = APIKey.query.filter_by(user_id=user_id)
             
-            keys = [dict(row) for row in cursor.fetchall()]
+            if not include_inactive:
+                query = query.filter_by(is_active=True)
+            
+            api_keys = query.order_by(APIKey.created_at.desc()).all()
             
             # Return full key values - user is authenticated via dashboard login
             # No need to hide keys since they're already behind authentication
+            return [key.to_dict(include_key_value=True) for key in api_keys]
             
-            return keys
-            
-        finally:
-            conn.close()
+        except Exception as e:
+            return []
     
-    def get_by_id(self, key_id: int) -> Optional[Dict[str, Any]]:
+    @staticmethod
+    def get_by_id(key_id: int) -> Optional[Dict[str, Any]]:
         """
         Get API key by ID
         
@@ -180,26 +210,20 @@ class APIKey:
         Returns:
             API key dictionary with full key value or None
         """
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        
         try:
-            cursor.execute('SELECT * FROM api_keys WHERE id = ?', (key_id,))
-            result = cursor.fetchone()
+            api_key = APIKey.query.get(key_id)
             
-            if not result:
+            if not api_key:
                 return None
             
-            api_key = dict(result)
-            
             # Return full key value - user is authenticated
+            return api_key.to_dict(include_key_value=True)
             
-            return api_key
-            
-        finally:
-            conn.close()
+        except Exception as e:
+            return None
     
-    def deactivate(self, key_id: int, user_id: int) -> Dict[str, Any]:
+    @staticmethod
+    def deactivate(key_id: int, user_id: int) -> Dict[str, Any]:
         """
         Deactivate an API key
         
@@ -210,31 +234,34 @@ class APIKey:
         Returns:
             Dict with success status
         """
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        
         try:
             # Verify ownership
-            cursor.execute('SELECT * FROM api_keys WHERE id = ? AND user_id = ?', (key_id, user_id))
-            if not cursor.fetchone():
+            api_key = APIKey.query.filter_by(id=key_id, user_id=user_id).first()
+            
+            if not api_key:
                 return {
                     'success': False,
                     'error': 'API key not found or access denied'
                 }
             
             # Deactivate
-            cursor.execute('UPDATE api_keys SET is_active = 0 WHERE id = ?', (key_id,))
-            conn.commit()
+            api_key.is_active = False
+            db.session.commit()
             
             return {
                 'success': True,
                 'message': 'API key deactivated'
             }
             
-        finally:
-            conn.close()
+        except Exception as e:
+            db.session.rollback()
+            return {
+                'success': False,
+                'error': str(e)
+            }
     
-    def delete(self, key_id: int, user_id: int) -> Dict[str, Any]:
+    @staticmethod
+    def delete(key_id: int, user_id: int) -> Dict[str, Any]:
         """
         Permanently delete an API key
         
@@ -245,31 +272,34 @@ class APIKey:
         Returns:
             Dict with success status
         """
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        
         try:
             # Verify ownership
-            cursor.execute('SELECT * FROM api_keys WHERE id = ? AND user_id = ?', (key_id, user_id))
-            if not cursor.fetchone():
+            api_key = APIKey.query.filter_by(id=key_id, user_id=user_id).first()
+            
+            if not api_key:
                 return {
                     'success': False,
                     'error': 'API key not found or access denied'
                 }
             
             # Delete
-            cursor.execute('DELETE FROM api_keys WHERE id = ?', (key_id,))
-            conn.commit()
+            db.session.delete(api_key)
+            db.session.commit()
             
             return {
                 'success': True,
                 'message': 'API key deleted'
             }
             
-        finally:
-            conn.close()
+        except Exception as e:
+            db.session.rollback()
+            return {
+                'success': False,
+                'error': str(e)
+            }
     
-    def update_name(self, key_id: int, user_id: int, name: str) -> Dict[str, Any]:
+    @staticmethod
+    def update_name(key_id: int, user_id: int, name: str) -> Dict[str, Any]:
         """
         Update API key name
         
@@ -281,31 +311,34 @@ class APIKey:
         Returns:
             Dict with success status
         """
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        
         try:
             # Verify ownership
-            cursor.execute('SELECT * FROM api_keys WHERE id = ? AND user_id = ?', (key_id, user_id))
-            if not cursor.fetchone():
+            api_key = APIKey.query.filter_by(id=key_id, user_id=user_id).first()
+            
+            if not api_key:
                 return {
                     'success': False,
                     'error': 'API key not found or access denied'
                 }
             
             # Update
-            cursor.execute('UPDATE api_keys SET name = ? WHERE id = ?', (name, key_id))
-            conn.commit()
+            api_key.name = name
+            db.session.commit()
             
             return {
                 'success': True,
                 'message': 'API key name updated'
             }
             
-        finally:
-            conn.close()
+        except Exception as e:
+            db.session.rollback()
+            return {
+                'success': False,
+                'error': str(e)
+            }
     
-    def count_active_keys(self, user_id: int) -> int:
+    @staticmethod
+    def count_active_keys(user_id: int) -> int:
         """
         Count active API keys for a user
         
@@ -315,13 +348,8 @@ class APIKey:
         Returns:
             Number of active keys
         """
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        
         try:
-            cursor.execute('SELECT COUNT(*) FROM api_keys WHERE user_id = ? AND is_active = 1', (user_id,))
-            count = cursor.fetchone()[0]
+            count = APIKey.query.filter_by(user_id=user_id, is_active=True).count()
             return count
-            
-        finally:
-            conn.close()
+        except Exception as e:
+            return 0
