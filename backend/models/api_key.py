@@ -153,7 +153,7 @@ class APIKey:
             include_inactive: Include inactive keys
             
         Returns:
-            List of API key dictionaries
+            List of API key dictionaries with full key values
         """
         conn = self._get_connection()
         cursor = conn.cursor()
@@ -166,12 +166,8 @@ class APIKey:
             
             keys = [dict(row) for row in cursor.fetchall()]
             
-            # Remove actual key values (only hashes should be stored/returned)
-            for key in keys:
-                # Show partial key for identification (first 10 chars)
-                if 'key_value' in key and key['key_value']:
-                    key['key_preview'] = key['key_value'][:13] + '...'
-                    key.pop('key_value')
+            # Return full key values - user is authenticated via dashboard login
+            # No need to hide keys since they're already behind authentication
             
             return keys
             
@@ -186,7 +182,7 @@ class APIKey:
             key_id: API key ID
             
         Returns:
-            API key dictionary or None
+            API key dictionary with full key value or None
         """
         conn = self._get_connection()
         cursor = conn.cursor()
@@ -200,10 +196,7 @@ class APIKey:
             
             api_key = dict(result)
             
-            # Show partial key
-            if 'key_value' in api_key and api_key['key_value']:
-                api_key['key_preview'] = api_key['key_value'][:13] + '...'
-                api_key.pop('key_value')
+            # Return full key value - user is authenticated
             
             return api_key
             
