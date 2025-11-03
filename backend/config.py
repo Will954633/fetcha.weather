@@ -1,7 +1,7 @@
 """
 Fetcha Weather - Backend Configuration
-Version: v1.0 • Updated: 2025-11-01 21:47 AEST (Brisbane)
-Force trigger Railway rebuild with PostgreSQL fix
+Version: v1.1 • Updated: 2025-03-11 14:57 AEST (Brisbane)
+Added Google OAuth support - includes GOOGLE_CLIENT_ID config
 """
 
 import os
@@ -51,6 +51,9 @@ class Config:
     FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
     VERIFY_EMAIL_URL = f"{FRONTEND_URL}/verify-email"
     RESET_PASSWORD_URL = f"{FRONTEND_URL}/reset-password"
+    
+    # Google OAuth Configuration
+    GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
     
     # API Rate Limiting
     RATE_LIMIT_ENABLED = True
