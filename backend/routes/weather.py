@@ -16,9 +16,8 @@ import time
 
 weather_bp = Blueprint('weather', __name__)
 
-# Get database path from config
+# Get config
 config = get_config()
-DB_PATH = config.DATABASE_PATH
 
 
 def validate_api_key_header():
@@ -33,8 +32,7 @@ def validate_api_key_header():
     if not api_key_value:
         return False, {'success': False, 'error': 'Missing API key. Provide via X-API-Key header or Authorization: Bearer header'}
     
-    api_key_model = APIKey(DB_PATH)
-    result = api_key_model.validate(api_key_value)
+    result = APIKey.validate(api_key_value)
     
     if not result['success']:
         return False, result
@@ -86,12 +84,10 @@ def get_weather_by_location():
     user_id = api_key_data['user_id']
     
     # Get user and check quota
-    user_model = User(DB_PATH)
-    user = user_model.get_by_id(user_id)
+    user = User.get_by_id(user_id)
     tier_config = config.TIERS.get(user['tier'], config.TIERS['free'])
     
-    usage_model = Usage(DB_PATH)
-    quota_status = usage_model.check_quota(user_id, user['tier'], tier_config['monthly_quota'])
+    quota_status = Usage.check_quota(user_id, user['tier'], tier_config['monthly_quota'])
     
     if not quota_status['within_quota']:
         return jsonify({
@@ -140,7 +136,7 @@ def get_weather_by_location():
         status_code = 200 if weather_result['success'] else 400
         
         # Log the request
-        usage_model.log_request(
+        Usage.log_request(
             user_id=user_id,
             api_key_id=api_key_data['id'],
             endpoint='/api/weather/location',
@@ -192,7 +188,7 @@ def get_weather_by_location():
         response_time_ms = int((time.time() - start_time) * 1000)
         
         # Still log failed request
-        usage_model.log_request(
+        Usage.log_request(
             user_id=user_id,
             api_key_id=api_key_data['id'],
             endpoint='/api/weather/location',
