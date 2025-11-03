@@ -11,9 +11,8 @@ from config import get_config
 
 usage_bp = Blueprint('usage', __name__)
 
-# Get database path from config
+# Get config
 config = get_config()
-DB_PATH = config.DATABASE_PATH
 
 
 @usage_bp.route('/monthly', methods=['GET'])
@@ -34,16 +33,14 @@ def get_monthly_usage():
         user_id = get_jwt_identity()
         month = request.args.get('month')
         
-        usage_model = Usage(DB_PATH)
-        usage_data = usage_model.get_monthly_usage(user_id, month)
+        usage_data = Usage.get_monthly_usage(user_id, month)
         
         # Get user tier for quota calculation
-        user_model = User(DB_PATH)
-        user = user_model.get_by_id(user_id)
+        user = User.get_by_id(user_id)
         tier_config = config.TIERS.get(user['tier'], config.TIERS['free'])
         
         # Check quota status
-        quota_status = usage_model.check_quota(
+        quota_status = Usage.check_quota(
             user_id,
             user['tier'],
             tier_config['monthly_quota']
@@ -82,8 +79,7 @@ def get_recent_requests():
         user_id = get_jwt_identity()
         limit = min(int(request.args.get('limit', 10)), 100)
         
-        usage_model = Usage(DB_PATH)
-        requests = usage_model.get_recent_requests(user_id, limit)
+        requests = Usage.get_recent_requests(user_id, limit)
         
         return jsonify({
             'success': True,
@@ -119,8 +115,7 @@ def get_usage_stats():
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
         
-        usage_model = Usage(DB_PATH)
-        stats = usage_model.get_usage_stats(user_id, start_date, end_date)
+        stats = Usage.get_usage_stats(user_id, start_date, end_date)
         
         return jsonify({
             'success': True,
@@ -153,8 +148,7 @@ def get_endpoint_breakdown():
         user_id = get_jwt_identity()
         month = request.args.get('month')
         
-        usage_model = Usage(DB_PATH)
-        breakdown = usage_model.get_endpoint_breakdown(user_id, month)
+        breakdown = Usage.get_endpoint_breakdown(user_id, month)
         
         return jsonify({
             'success': True,
@@ -187,8 +181,7 @@ def get_daily_usage():
         user_id = get_jwt_identity()
         month = request.args.get('month')
         
-        usage_model = Usage(DB_PATH)
-        daily_data = usage_model.get_daily_usage(user_id, month)
+        daily_data = Usage.get_daily_usage(user_id, month)
         
         return jsonify({
             'success': True,

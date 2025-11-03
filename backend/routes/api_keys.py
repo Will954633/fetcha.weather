@@ -11,9 +11,8 @@ from config import get_config
 
 api_keys_bp = Blueprint('api_keys', __name__)
 
-# Get database path from config
+# Get config
 config = get_config()
-DB_PATH = config.DATABASE_PATH
 
 
 @api_keys_bp.route('/', methods=['GET'])
@@ -34,8 +33,7 @@ def list_api_keys():
         user_id = get_jwt_identity()
         include_inactive = request.args.get('include_inactive', 'false').lower() == 'true'
         
-        api_key_model = APIKey(DB_PATH)
-        keys = api_key_model.get_by_user(user_id, include_inactive=include_inactive)
+        keys = APIKey.get_by_user(user_id, include_inactive=include_inactive)
         
         return jsonify({
             'success': True,
@@ -74,8 +72,7 @@ def create_api_key():
         name = data.get('name', '').strip() if data.get('name') else None
         
         # Check if user has too many active keys (optional limit)
-        api_key_model = APIKey(DB_PATH)
-        active_count = api_key_model.count_active_keys(user_id)
+        active_count = APIKey.count_active_keys(user_id)
         
         MAX_KEYS_PER_USER = 10
         if active_count >= MAX_KEYS_PER_USER:
@@ -85,7 +82,7 @@ def create_api_key():
             }), 400
         
         # Create API key
-        result = api_key_model.create(user_id, name=name)
+        result = APIKey.create(user_id, name=name)
         
         if not result['success']:
             return jsonify(result), 400
@@ -124,8 +121,7 @@ def get_api_key(key_id):
     try:
         user_id = get_jwt_identity()
         
-        api_key_model = APIKey(DB_PATH)
-        api_key = api_key_model.get_by_id(key_id)
+        api_key = APIKey.get_by_id(key_id)
         
         if not api_key:
             return jsonify({
@@ -191,8 +187,7 @@ def update_api_key(key_id):
             }), 400
         
         # Update API key name
-        api_key_model = APIKey(DB_PATH)
-        result = api_key_model.update_name(key_id, user_id, name)
+        result = APIKey.update_name(key_id, user_id, name)
         
         if not result['success']:
             return jsonify(result), 400 if 'not found' in result.get('error', '').lower() else 403
@@ -226,8 +221,7 @@ def deactivate_api_key(key_id):
     try:
         user_id = get_jwt_identity()
         
-        api_key_model = APIKey(DB_PATH)
-        result = api_key_model.deactivate(key_id, user_id)
+        result = APIKey.deactivate(key_id, user_id)
         
         if not result['success']:
             return jsonify(result), 400 if 'not found' in result.get('error', '').lower() else 403
@@ -261,8 +255,7 @@ def delete_api_key(key_id):
     try:
         user_id = get_jwt_identity()
         
-        api_key_model = APIKey(DB_PATH)
-        result = api_key_model.delete(key_id, user_id)
+        result = APIKey.delete(key_id, user_id)
         
         if not result['success']:
             return jsonify(result), 400 if 'not found' in result.get('error', '').lower() else 403
@@ -303,15 +296,13 @@ def validate_api_key():
         
         api_key_value = data['api_key']
         
-        api_key_model = APIKey(DB_PATH)
-        result = api_key_model.validate(api_key_value)
+        result = APIKey.validate(api_key_value)
         
         if not result['success']:
             return jsonify(result), 401
         
         # Get user tier for quota info
-        user_model = User(DB_PATH)
-        user = user_model.get_by_id(result['api_key']['user_id'])
+        user = User.get_by_id(result['api_key']['user_id'])
         
         tier_config = config.TIERS.get(user['tier'], config.TIERS['free'])
         
