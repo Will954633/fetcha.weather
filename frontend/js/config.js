@@ -15,9 +15,9 @@
   } else if (hostname.includes('netlify.app')) {
     // Production on Netlify - connects to Railway backend
     apiBase = 'https://web-production-2d722.up.railway.app/api';
-  } else if (hostname.includes('fetcha.weather') || hostname.includes('fetcha.net')) {
-    // Production with custom domain
-    apiBase = 'https://web-production-2d722.up.railway.app/api';
+  } else if (hostname.includes('fetcha.net') || hostname.includes('fetcha.weather')) {
+    // Production with custom domain - use api.fetcha.net subdomain
+    apiBase = 'https://api.fetcha.net/api';
   } else {
     // Default to Railway backend for any other deployment
     apiBase = 'https://web-production-2d722.up.railway.app/api';
