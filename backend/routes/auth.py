@@ -8,7 +8,10 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from email_validator import validate_email, EmailNotValidError
 from models import User
 from services.email_service import EmailService
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 import re
+import secrets
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -394,6 +397,122 @@ def reset_password():
         return jsonify({
             'success': False,
             'error': 'An error occurred while resetting password'
+        }), 500
+
+
+@auth_bp.route('/google-login', methods=['POST'])
+def google_login():
+    """
+    Google OAuth login endpoint
+    
+    Request body:
+    {
+        "credential": "google_id_token_here"
+    }
+    
+    Returns:
+        JSON response with JWT tokens and user data
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'credential' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: credential'
+            }), 400
+        
+        google_token = data['credential']
+        
+        # Verify Google ID token
+        try:
+            google_client_id = current_app.config.get('GOOGLE_CLIENT_ID')
+            
+            if not google_client_id:
+                current_app.logger.error('GOOGLE_CLIENT_ID not configured')
+                return jsonify({
+                    'success': False,
+                    'error': 'Google authentication is not properly configured'
+                }), 500
+            
+            # Verify the Google ID token
+            idinfo = id_token.verify_oauth2_token(
+                google_token, 
+                google_requests.Request(), 
+                google_client_id
+            )
+            
+            # Get user info from Google token
+            email = idinfo.get('email')
+            full_name = idinfo.get('name', email.split('@')[0])
+            google_id = idinfo.get('sub')
+            
+            if not email:
+                return jsonify({
+                    'success': False,
+                    'error': 'Could not retrieve email from Google account'
+                }), 400
+            
+            # Check if user exists
+            user = User.get_by_email(email)
+            
+            if user:
+                # Convert to dict if it's a model instance
+                if hasattr(user, 'to_dict'):
+                    user_data = user.to_dict()
+                else:
+                    user_data = user
+                
+                # Create JWT tokens
+                access_token = create_access_token(identity=user_data['id'])
+                refresh_token = create_refresh_token(identity=user_data['id'])
+                
+                current_app.logger.info(f'User logged in via Google: {email}')
+                
+                return jsonify({
+                    'success': True,
+                    'message': 'Login successful',
+                    'access_token': access_token,
+                    'refresh_token': refresh_token,
+                    'user': user_data
+                }), 200
+            else:
+                # Create new user with Google account
+                # Generate a random password for Google users (they won't need it)
+                random_password = secrets.token_urlsafe(32)
+                
+                result = User.create(email, random_password, full_name)
+                
+                if not result['success']:
+                    return jsonify(result), 400
+                
+                # Create JWT tokens
+                access_token = create_access_token(identity=result['user']['id'])
+                refresh_token = create_refresh_token(identity=result['user']['id'])
+                
+                current_app.logger.info(f'New user registered via Google: {email}')
+                
+                return jsonify({
+                    'success': True,
+                    'message': 'Welcome! Account created successfully',
+                    'access_token': access_token,
+                    'refresh_token': refresh_token,
+                    'user': result['user']
+                }), 201
+                
+        except ValueError as e:
+            # Invalid token
+            current_app.logger.error(f'Invalid Google token: {str(e)}')
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Google authentication token'
+            }), 401
+            
+    except Exception as e:
+        current_app.logger.error(f'Google login error: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': 'An error occurred during Google authentication'
         }), 500
 
 

@@ -189,11 +189,102 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
 });
 
 // ================================
-// Google Sign In (Placeholder)
+// Google Sign In
 // ================================
 
+// Google Sign-In configuration
+let googleInitialized = false;
+
+// Initialize Google Sign-In when the library loads
+window.addEventListener('load', () => {
+  if (window.google && window.google.accounts) {
+    initializeGoogleSignIn();
+  } else {
+    // If Google library hasn't loaded yet, wait for it
+    const checkGoogleInterval = setInterval(() => {
+      if (window.google && window.google.accounts) {
+        clearInterval(checkGoogleInterval);
+        initializeGoogleSignIn();
+      }
+    }, 100);
+    
+    // Give up after 10 seconds
+    setTimeout(() => clearInterval(checkGoogleInterval), 10000);
+  }
+});
+
+function initializeGoogleSignIn() {
+  try {
+    // Google Client ID should be set in environment or config
+    const googleClientId = window.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID_HERE';
+    
+    window.google.accounts.id.initialize({
+      client_id: googleClientId,
+      callback: handleGoogleCallback,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    
+    googleInitialized = true;
+    console.log('Google Sign-In initialized');
+  } catch (error) {
+    console.error('Failed to initialize Google Sign-In:', error);
+  }
+}
+
+async function handleGoogleCallback(response) {
+  const submitBtn = document.getElementById('googleSignIn');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Signing in with Google...';
+  
+  try {
+    const backendResponse = await fetch(`${window.API_BASE}/auth/google-login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        credential: response.credential
+      })
+    });
+    
+    const data = await backendResponse.json();
+    
+    if (!backendResponse.ok) {
+      throw new Error(data.error || 'Google sign-in failed');
+    }
+    
+    // Store JWT token
+    localStorage.setItem('jwt_token', data.access_token);
+    
+    showStatus('Google sign-in successful! Redirecting...', 'success');
+    
+    // Redirect to dashboard
+    setTimeout(() => {
+      window.location.href = 'weather-dashboard.html';
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Google sign-in error:', error);
+    showStatus(error.message, 'error');
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+}
+
 document.getElementById('googleSignIn').addEventListener('click', () => {
-  showStatus('Google Sign In coming soon!', 'info');
+  if (!googleInitialized) {
+    showStatus('Google Sign-In is still loading. Please wait...', 'info');
+    return;
+  }
+  
+  try {
+    window.google.accounts.id.prompt();
+  } catch (error) {
+    console.error('Failed to show Google prompt:', error);
+    showStatus('Failed to initiate Google Sign-In. Please try again.', 'error');
+  }
 });
 
 // ================================

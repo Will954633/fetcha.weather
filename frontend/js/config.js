@@ -26,6 +26,9 @@
   // Set global API base
   window.API_BASE = apiBase;
   
+  // Google OAuth Configuration
+  window.GOOGLE_CLIENT_ID = '400382614619-fbe3daa832pmmf1od3u2bdjjs0gcqgvl.apps.googleusercontent.com';
+  
   console.log('Environment detected:', hostname);
   console.log('API Base URL:', apiBase);
 })();
