@@ -14,9 +14,8 @@
     // Google Ads Conversion ID (updated with your actual ID)
     const CONVERSION_ID = 'AW-612218951';
     
-    // TODO: Replace with your Conversion Label from Google Ads
-    // It will look like: AbC-defGHIjklMNOpq
-    const CONVERSION_LABEL = 'AbC-defGHIjklMNOpq'; // <-- REPLACE THIS AFTER SETTING UP GOOGLE ADS
+    // Google Ads Conversion Label (updated with your actual label)
+    const CONVERSION_LABEL = 'y239COmE9t0DEMfw9qMC';
     
     // ===================================
     // GOOGLE ANALYTICS INITIALIZATION

@@ -164,6 +164,11 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       // Store JWT token for auto-login
       localStorage.setItem('jwt_token', data.access_token);
       
+      // Track conversion for Google Ads
+      if (window.trackSignUp) {
+        window.trackSignUp();
+      }
+      
       showStatus(data.message || 'Welcome! Redirecting to dashboard...', 'success');
       
       // Redirect to dashboard immediately
