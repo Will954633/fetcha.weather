@@ -14,8 +14,8 @@
     // Google Ads Conversion ID (updated with your actual ID)
     const CONVERSION_ID = 'AW-612218951';
     
-    // Google Ads Conversion Label (updated with your actual label)
-    const CONVERSION_LABEL = 'y239COmE9t0DEMfw9qMC';
+    // Google Ads Conversion Label for Sign-up conversion (updated with your actual label)
+    const CONVERSION_LABEL = 'IeRBCJCH_rgbEMfw9qMC';
     
     // ===================================
     // GOOGLE ANALYTICS INITIALIZATION
