@@ -85,9 +85,9 @@ def get_weather_by_location():
     
     # Get user and check quota
     user = User.get_by_id(user_id)
-    tier_config = config.TIERS.get(user['tier'], config.TIERS['free'])
+    tier_config = config.TIERS.get(user.tier, config.TIERS['free'])
     
-    quota_status = Usage.check_quota(user_id, user['tier'], tier_config['monthly_quota'])
+    quota_status = Usage.check_quota(user_id, user.tier, tier_config['monthly_quota'])
     
     if not quota_status['within_quota']:
         return jsonify({
@@ -168,7 +168,7 @@ def get_weather_by_location():
                     'response_time_ms': response_time_ms,
                     'quota_remaining': quota_status['requests_remaining'],
                     'quota_used': quota_status['requests_used'],
-                    'tier': user['tier']
+                    'tier': user.tier
                 }
             }), 200
         else:

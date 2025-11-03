@@ -304,14 +304,14 @@ def validate_api_key():
         # Get user tier for quota info
         user = User.get_by_id(result['api_key']['user_id'])
         
-        tier_config = config.TIERS.get(user['tier'], config.TIERS['free'])
+        tier_config = config.TIERS.get(user.tier, config.TIERS['free'])
         
         return jsonify({
             'success': True,
             'message': 'API key is valid',
             'api_key_id': result['api_key']['id'],
             'user_id': result['api_key']['user_id'],
-            'tier': user['tier'],
+            'tier': user.tier,
             'quota': tier_config['monthly_quota'],
             'rate_limit': tier_config['rate_limit']
         }), 200
